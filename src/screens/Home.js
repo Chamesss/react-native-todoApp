@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Button, Switch, TouchableOpacity, FlatList, Modal } from 'react-native'
+import { Text, View, StyleSheet, Button, Switch, TouchableOpacity, FlatList, Modal, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectTheme } from '../slices/themeSlice'
@@ -18,39 +18,48 @@ const Home = () => {
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
-
+    const categories = useState(() => {
+        const countByCategory = {};
+        data.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1)
+        return countByCategory;
+    })
     const [selectedItemId, setSelectedItemId] = useState(null);
     const [isModalVisible, setModalVisible] = useState(null)
-    console.log(isModalVisible)
 
     return (
-        <View className={`relative flex-1 ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
-            <View className='bg-[#0ab6ab] w-full p-5 justify-between flex-row'>
-                <Text className='text-xl font-medium tracking-wider'>Todo List</Text>
-                <TouchableOpacity>
-                    <Icon name='three-bars' size={30} />
-                </TouchableOpacity>
-            </View>
-            <View className='p-5 mt-5'>
-                <Text className='color-white text-start text-xl font-semibold tracking-wider'>Today</Text>
-                <Text className='color-white opacity-50 mb-5'>{date}</Text>
-                <FlatList
-                    data={data}
-                    renderItem={({ item }) =>
-                        <TaskBox
-                            item={item}
-                            isSelected={item.id === selectedItemId}
-                            onSelect={() => setSelectedItemId(item.id)}
-                        />}
-                    keyExtractor={(item) => item.id}
-                />
-            </View>
-            <View className='absolute bottom-0 right-0'>
-                <TouchableOpacity>
-                    <View style={styles.dropShadow} className='mr-6 mb-12 w-20 h-20 rounded-full items-center justify-center filter drop-shadow-4xl'>
-                        <Icon2 color='black' name='plus' size={30} />
+        <>
+            <View className={`relative flex-1 p-8 ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
+                <View className='flex-row justify-between items-start'>
+                    <View>
+                        <Text className='color-white text-start text-xl font-semibold tracking-wider'>Today</Text>
+                        <Text className='color-white opacity-50 mb-5'>{date}</Text>
                     </View>
-                </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                        <Icon color={'white'} name='three-bars' size={30} />
+                    </TouchableOpacity>
+                </View>
+                <View className='mt-4'>
+                    <Text className='color-white text-3xl font-semibold tracking-widest'>Lists</Text>
+                </View>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
+                    <View className='mt-5 flex-row flex-wrap gap-4'>
+                        {Object.entries(categories[0]).map((item) => <View className='w-48 h-48'>
+                            <TaskBox categoryName={item[0]} itemCount={item[1]} />
+                        </View>)}
+                        {/* <FlatList
+                            data={Object.entries(categories[0])}
+                            renderItem={({ item }) => (
+                                <TaskBox
+                                    categoryName={item[0]}
+                                    itemCount={item[1]}
+                                />
+                            )}
+                            keyExtractor={(item) => item[0]}
+                        /> */}
+                    </View>
+                </ScrollView>
             </View>
 
             <View className='absolute bottom-0 right-0'>
@@ -60,7 +69,6 @@ const Home = () => {
                     </View>
                 </TouchableOpacity>
             </View>
-
             <Modal
                 transparent={true}
                 animationType="slide"
@@ -69,17 +77,14 @@ const Home = () => {
             >
                 <ModalWindow exitModal={setModalVisible} />
             </Modal>
-
-            {/* <View onChange={() => { dispatch(switchThemeAsync()) }}>
-                <Switch value={dark === true} />
-            </View>
+            {/* 
             <Button
                 onPress={() => { navigation.navigate('Draft') }}
                 title='Go to draft'
                 color={dark ? 'rgb(21 94 117)' : 'rgb(34 211 238)'}
                 accessibilityLabel="Learn more about this purple button"
             /> */}
-        </View>
+        </>
     )
 }
 
