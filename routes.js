@@ -10,6 +10,7 @@ import SplashScreen from './src/screens/SplashScreen';
 import Draft from './src/screens/Draft';
 import { View } from 'react-native';
 import DrawerElements from './src/components/DrawerElements'
+import Category from './src/screens/Category';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -37,6 +38,7 @@ const AppStack = () => {
         >
             <Stack.Screen name="SplashScreen" component={SplashScreen} />
             <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name='CategoryListing' component={Category} />
         </Stack.Navigator>
     );
 };

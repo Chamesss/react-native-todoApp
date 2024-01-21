@@ -115,3 +115,17 @@ export const svgs = {
     travel: Travel,
     work: Work
 }
+
+export const colors = {
+    all: 'bg-blue-500',
+    events: 'bg-purple-500',
+    fun: 'bg-yellow-500',
+    health: 'bg-red-500',
+    home: 'bg-yellow-900',
+    music: 'bg-rose-600',
+    shop: 'bg-emerald-600',
+    sport: 'bg-orange-500',
+    study: 'bg-purple-300',
+    travel: 'bg-cyan-500',
+    work: 'bg-yellow-950',
+};
