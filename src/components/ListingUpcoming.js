@@ -1,18 +1,43 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native'
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import { TouchableOpacity, View, Text } from 'react-native';
+import CustomCheckBox from './CustomCheckBox';
 
-export default function ListingUpcoming({ tasks }) {
+const ListingUpcoming = ({ task }) => {
+    const [selected, setSelected] = useState(false);
+    const [dateString, setDateString] = useState('');
+
+    useEffect(() => {
+        const today = new Date();
+        const taskDate = new Date(task.ending);
+        taskDate.setHours(0, 0, 0, 0); // Set the time to midnight
+
+        const timeDifference = taskDate.getTime() - today.getTime();
+        const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+        if (daysDifference === 0) {
+            setDateString('Today');
+        } else if (daysDifference === 1) {
+            setDateString('Tomorrow');
+        } else {
+            setDateString(taskDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }));
+        }
+    }, [task]);
+
     return (
-        <FlatList
-            data={tasks}
-            renderItem={({ item }) => (
+        <TouchableOpacity onPress={() => setSelected(!selected)}>
+            <View className={`flex-row justify-between items-center p-4 mt-5 ${selected && 'bg-gray-100 rounded-lg'}`}>
                 <View>
-                    <Text>{item.title}</Text>
+                    <Text className='text-lg'>{task.title}</Text>
+                    <Text className=''>
+                        {task.ending.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {'  '}
+                        {dateString}
+                    </Text>
                 </View>
-            )}
-            keyExtractor={(item) => item.id.toString()}
-        />
-    )
-}
+                <CustomCheckBox setSelected={setSelected} selected={selected} />
+            </View>
+        </TouchableOpacity>
+    );
+};
 
-const styles = StyleSheet.create({})
+export default ListingUpcoming;

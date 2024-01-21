@@ -8,6 +8,8 @@ import { svgs } from '../components/constants'
 import ListingLate from '../components/ListingLate'
 import ListingUpcoming from '../components/ListingUpcoming'
 import ListingDone from '../components/ListingDone'
+import { useNavigation } from '@react-navigation/native'
+import { ScrollView } from 'react-native-virtualized-view'
 
 export default function Category({ route }) {
     const [lateTasks, setLateTasks] = useState(null)
@@ -18,6 +20,7 @@ export default function Category({ route }) {
     const { categoryName, itemCount, tasks } = route.params;
     const color = colors[categoryName];
     const SVG = svgs[categoryName]
+    const navigation = useNavigation()
 
     useEffect(() => {
         if (tasks.length > 0) {
@@ -41,10 +44,10 @@ export default function Category({ route }) {
     }, [tasks])
     return (
         <>
-            <View className={`relative flex-1 ${color}`}>
+            {!loading && <View className={`relative flex-1 ${color}`}>
                 <View className='px-8 pt-8 pb-4'>
                     <View className='flex-row justify-between items-center'>
-                        <Icon name='left' color='white' size={25} />
+                        <Icon name='left' color='white' size={25} onPress={() => navigation.goBack()} />
                         <Icon2 name='dots-three-vertical' color='white' size={25} />
                     </View>
                     <View className='p-4'>
@@ -55,36 +58,40 @@ export default function Category({ route }) {
                         <Text className='color-white text-lg'>{itemCount}{' '}{itemCount.toString() === '1' ? 'Task' : 'Tasks'}</Text>
                     </View>
                 </View>
-                <View className='w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
-                    <View className='p-8'>
-                        {lateTasks && lateTasks.length > 0 && (
-                            <View>
-                                <Text className='text-lg tracking-wide opacity-50 px-4 pt-4'>Late</Text>
-                                <FlatList
-                                    data={lateTasks}
-                                    renderItem={({ item }) => (
-                                        <ListingLate task={item} />
-                                    )}
-                                    keyExtractor={(item) => item.id}
-                                />
-                            </View>
-                        )}
-                        {upcomingTasks && upcomingTasks.length > 0 && (
-                            <View>
-                                <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Upcoming</Text>
-                                <ListingUpcoming tasks={upcomingTasks} />
-                            </View>
-                        )}
-                        {finishedTasks && finishedTasks.length > 0 && (
-                            <View>
-                                <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Done</Text>
-                                <ListingDone tasks={finishedTasks} />
-                            </View>
-                        )}
-                    </View>
+                <View className='flex-1 w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
+                    <ScrollView>
+                        <View className='p-8'>
+                            {lateTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-4 opacity-50'>Late</Text>}
+                            {lateTasks?.map((item) => <ListingLate key={item.id} task={item} />)}
+                            {upcomingTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Upcoming</Text>}
+                            {upcomingTasks?.map((item) => <ListingUpcoming key={item.id} task={item} />)}
+                            {finishedTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Done</Text>}
+                            {finishedTasks?.map((item) => <ListingDone key={item.id} task={item} />)}
+                        </View>
+                    </ScrollView>
                 </View>
                 <Add />
-            </View>
+                {/* <View className='p-8'>
+                            {lateTasks && lateTasks.length > 0 && (
+                                <View>
+                                    <Text className='text-lg tracking-wide opacity-50 px-4 pt-4'>Late</Text>
+                                    {lateTasks.map((item) => <ListingLate key={item.id} task={item} />)}
+                                </View>
+                            )}
+                            {upcomingTasks && upcomingTasks.length > 0 && (
+                                <View>
+                                    <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Upcoming</Text>
+                                    <ListingUpcoming tasks={upcomingTasks} />
+                                </View>
+                            )}
+                            {finishedTasks && finishedTasks.length > 0 && (
+                                <View>
+                                    <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Done</Text>
+                                    <ListingDone tasks={finishedTasks} />
+                                </View>
+                            )}
+                        </View> */}
+            </View>}
         </>
     )
 }

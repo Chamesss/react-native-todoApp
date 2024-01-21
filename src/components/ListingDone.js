@@ -1,18 +1,22 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native'
-import React from 'react'
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
+import CustomCheckBox from './CustomCheckBox'
 
-export default function ListingDone({ tasks }) {
+export default function ListingDone({ task }) {
+    const [selected, setSelected] = useState(false)
     return (
-        <FlatList
-            data={tasks}
-            renderItem={({ item }) => (
+        <TouchableOpacity onPress={() => setSelected(!selected)}>
+            <View className={`flex-row justify-between items-center p-4 mt-5 ${selected && 'bg-gray-100 rounded-lg'}`}>
                 <View>
-                    <Text>{item.title}</Text>
+                    <Text className='text-lg'>{task.title}</Text>
+                    <Text className='color-red-500'>
+                        {task.ending.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {'  '}
+                        {task.ending.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}
+                    </Text>
                 </View>
-            )}
-            keyExtractor={(item) => item.id.toString()}
-        />
+                <CustomCheckBox setSelected={setSelected} selected={selected} />
+            </View>
+        </TouchableOpacity>
     )
 }
-
-const styles = StyleSheet.create({})

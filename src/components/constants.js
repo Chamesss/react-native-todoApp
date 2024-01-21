@@ -19,7 +19,7 @@ export const data = [
         id: 2,
         title: "Exercise",
         created: new Date(new Date().getTime() + 60 * 60000),
-        ending: new Date(new Date().getTime() + 40 * 60000),
+        ending: new Date(new Date().getTime() + 40 * 6000000),
         status: 'todo',
         category: 'sport'
     },
@@ -27,7 +27,7 @@ export const data = [
         id: 3,
         title: "Drawing",
         created: new Date(new Date().getTime() + 120 * 60000),
-        ending: new Date(new Date().getTime() + 160 * 60000),
+        ending: new Date(new Date().getTime() + 160 * 6000000),
         status: 'todo',
         category: 'fun'
     },
