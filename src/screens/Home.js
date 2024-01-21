@@ -28,23 +28,26 @@ const Home = () => {
 
     return (
         <>
-            <View className={`relative flex-1 p-8 ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
-                <View className='flex-row justify-between items-start'>
+            <View className={`relative flex-1 ${dark ? 'bg-slate-900' : 'bg-[rgb(252,252,252)]'}`}>
+                <View className='flex-row justify-between items-start pt-8 px-8'>
                     <View>
-                        <Text className='color-white text-start text-xl font-semibold tracking-wider'>Today</Text>
-                        <Text className='color-white opacity-50 mb-5'>{date}</Text>
+                        <Text className=' text-start text-xl font-semibold tracking-wider'>Today</Text>
+                        <Text className=' opacity-50 mb-5'>{date}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                        <Icon color={'white'} name='three-bars' size={30} />
+                        <Icon color={'black'} name='three-bars' size={30} />
                     </TouchableOpacity>
                 </View>
-                <View className='mt-4'>
-                    <Text className='color-white text-3xl font-semibold tracking-widest'>Lists</Text>
+                <View className='mt-4 px-8 pb-4'>
+                    <Text className=' text-3xl font-semibold tracking-widest'>Lists</Text>
                 </View>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    <View className='mt-5 flex-row flex-wrap gap-4'>
+                    <View className='mt-5 pb-4 justify-center items-center flex-wrap flex-row gap-4'>
+                        <View className='w-48 h-48'>
+                            <TaskBox categoryName={'all'} itemCount={212} />
+                        </View>
                         {Object.entries(categories[0]).map((item) => <View className='w-48 h-48'>
                             <TaskBox categoryName={item[0]} itemCount={item[1]} />
                         </View>)}
@@ -65,7 +68,7 @@ const Home = () => {
             <View className='absolute bottom-0 right-0'>
                 <TouchableOpacity onPress={() => setModalVisible(!isModalVisible)}>
                     <View style={styles.dropShadow} className='mr-6 mb-12 w-20 h-20 rounded-full items-center justify-center filter drop-shadow-4xl'>
-                        <Icon2 color='black' name='plus' size={30} />
+                        <Icon2 color='white' name='plus' size={30} />
                     </View>
                 </TouchableOpacity>
             </View>
@@ -92,7 +95,7 @@ export default Home
 
 const styles = StyleSheet.create({
     dropShadow: {
-        backgroundColor: 'rgba(10, 182, 171, 1)',
+        backgroundColor: '#3b82f6',
         shadowColor: 'rgba(10, 182, 171, 0.4)',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.8,

@@ -5,7 +5,7 @@ export const data = [
         created: new Date(new Date().getTime() - 10 * 60000),
         ending: new Date(new Date().getTime() + 10 * 60000),
         status: 'done',
-        category: 'sport'
+        category: 'shop'
     },
     {
         id: 1,
@@ -13,7 +13,7 @@ export const data = [
         created: new Date(new Date().getTime() - 20 * 60000),
         ending: new Date(new Date().getTime() + 30 * 60000),
         status: 'done',
-        category: 'health'
+        category: 'work'
     },
     {
         id: 2,
@@ -21,7 +21,7 @@ export const data = [
         created: new Date(new Date().getTime() + 60 * 60000),
         ending: new Date(new Date().getTime() + 40 * 60000),
         status: 'todo',
-        category: 'study'
+        category: 'sport'
     },
     {
         id: 3,
@@ -29,7 +29,63 @@ export const data = [
         created: new Date(new Date().getTime() + 120 * 60000),
         ending: new Date(new Date().getTime() + 160 * 60000),
         status: 'todo',
-        category: 'work'
+        category: 'fun'
+    },
+    {
+        id: 4,
+        title: "Partying",
+        created: new Date(new Date().getTime() - 10 * 60000),
+        ending: new Date(new Date().getTime() + 10 * 60000),
+        status: 'done',
+        category: 'events'
+    },
+    {
+        id: 5,
+        title: "Cleaning",
+        created: new Date(new Date().getTime() - 20 * 60000),
+        ending: new Date(new Date().getTime() + 30 * 60000),
+        status: 'done',
+        category: 'home'
+    },
+    {
+        id: 6,
+        title: "Playing guitar",
+        created: new Date(new Date().getTime() + 60 * 60000),
+        ending: new Date(new Date().getTime() + 40 * 60000),
+        status: 'todo',
+        category: 'music'
+    },
+    {
+        id: 7,
+        title: "See Doctor",
+        created: new Date(new Date().getTime() + 120 * 60000),
+        ending: new Date(new Date().getTime() + 160 * 60000),
+        status: 'todo',
+        category: 'health'
+    },
+    {
+        id: 8,
+        title: "Playing guitar",
+        created: new Date(new Date().getTime() + 60 * 60000),
+        ending: new Date(new Date().getTime() + 40 * 60000),
+        status: 'todo',
+        category: 'music'
+    },
+    {
+        id: 9,
+        title: "Travel",
+        created: new Date(new Date().getTime() + 120 * 60000),
+        ending: new Date(new Date().getTime() + 160 * 60000),
+        status: 'todo',
+        category: 'travel'
+    },
+    {
+        id: 10,
+        title: "Study",
+        created: new Date(new Date().getTime() + 120 * 60000),
+        ending: new Date(new Date().getTime() + 160 * 60000),
+        status: 'todo',
+        category: 'study'
     },
 ];
 

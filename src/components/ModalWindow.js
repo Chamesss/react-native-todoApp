@@ -45,7 +45,7 @@ export default function ModalWindow({ exitModal }) {
     // }
     return (
 
-        <View className='flex-1 relative items-center w-full h-full pt-10 bg-slate-900'>
+        <View className='flex-1 relative items-center w-full h-full pt-10 bg-white'>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1, width: '100%' }}
@@ -57,15 +57,16 @@ export default function ModalWindow({ exitModal }) {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View className='relative flex-row px-8 items-center w-full justify-center'>
-                        <Text className='color-white text-2xl tracking-wide'>New Task</Text>
-                        <Icon2 name='x' size={35} style={{ position: 'absolute', right: 22 }} color='white'
+                        <Text className='color-black text-2xl tracking-wide'>New Task</Text>
+                        <Icon2 name='x' size={35} style={{ position: 'absolute', right: 22 }} color='black'
                             onPress={() => exitModal(false)}
                         />
                     </View>
                     <View className='mt-16 px-8 w-full'>
-                        <Text className='color-white text-xl tracking-wider mb-4'>What are you planning?</Text>
+                        <Text className='color-black/[.5] text-xl tracking-wider mb-4'>What are you planning?</Text>
                         <TextInput
-                            className='w-full rounded-md text-xl mr-4 p-4 color-white border border-solid border-slate-50/[.5]'
+                            className='w-full text-xl py-4 color-black'
+                            selectionColor={'black'}
                             multiline={true}
                             numberOfLines={4}
                             textAlignVertical="top"
@@ -80,23 +81,23 @@ export default function ModalWindow({ exitModal }) {
                                 <Text className='absolute text-start color-red-600 text-sm'>Add your task here please.</Text>
                             )}
                         </View>
-                        <View className='border border-solid border-slate-50/[.5] w-full my-8' />
+                        <View className='border border-black/[.2] my-8' />
                         <TouchableOpacity onPress={() => setShowPicker(!showPicker)}>
                             <View className='flex-row items-center'>
-                                <Icon2 onPressIn={() => setShowPicker(!showPicker)} name='bell' size={20} color='white' />
-                                <Text className='color-white text-xl ml-5'>{newDate}</Text>
+                                <Icon2 onPressIn={() => setShowPicker(!showPicker)} name='bell' size={20} color='black' />
+                                <Text className='color-black text-xl ml-5'>{newDate}</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => setShowTimer(!showTimer)}>
                             <View className='flex-row items-center mt-5'>
-                                <Icon2 name='clock' size={20} color='white' />
-                                <Text className='color-white text-xl ml-5'>{hours}</Text>
+                                <Icon2 name='clock' size={20} color='black' />
+                                <Text className='color-black text-xl ml-5'>{hours}</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity>
                             <View className='flex-row items-center mt-5 mb-8'>
-                                <Icon2 name='tag' size={20} color='white' />
-                                <Text className='color-white text-xl ml-5'>Category</Text>
+                                <Icon2 name='tag' size={20} color='rgba(0, 0, 0, 0.5)' />
+                                <Text className='color-black/[.5] text-xl ml-5'>Category</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -137,8 +138,8 @@ export default function ModalWindow({ exitModal }) {
                 </ScrollView>
             </KeyboardAvoidingView>
             <View className=' justify-end w-full'>
-                <Pressable onPress={handleCreateTask} className='bg-[#0ab6ab] p-5'>
-                    <Text className='text-center tracking-wider text-lg font-semibold color-white'>CREATE</Text>
+                <Pressable onPress={handleCreateTask} className='bg-blue-500 p-5'>
+                    <Text className='text-center tracking-widest text-lg font-semibold color-white'>Create</Text>
                 </Pressable>
             </View>
         </View>

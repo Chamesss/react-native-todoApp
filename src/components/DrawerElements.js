@@ -12,9 +12,10 @@ const DrawerElements = (props) => {
         <DrawerContentScrollView {...props}>
             <View className='justify-center items-center w-full'>
                 <Text className='text-center tracking-wider'>Settings</Text>
-                <View onChange={() => { dispatch(switchThemeAsync()) }}>
-                    <Switch value={dark === true} disabled={true} />
+                <View>
+                    <Switch onChange={() => { dispatch(switchThemeAsync()) }} />
                 </View>
+                <Text>AAAAAA</Text>
             </View>
         </DrawerContentScrollView>
     );
