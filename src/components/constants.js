@@ -10,9 +10,9 @@ export const data = [
     {
         id: 1,
         title: "Work on Project",
-        created: new Date(new Date().getTime() - 20 * 60000),
-        ending: new Date(new Date().getTime() + 30 * 60000),
-        status: 'done',
+        created: new Date(new Date().getTime() - 40 * 60000),
+        ending: new Date(new Date().getTime() - 20 * 60000),
+        status: 'todo',
         category: 'work'
     },
     {

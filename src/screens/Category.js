@@ -1,11 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Add from '../components/Add'
 import { colors } from '../components/constants'
 import Icon from 'react-native-vector-icons/AntDesign'
 import Icon2 from 'react-native-vector-icons/Entypo'
 import { svgs } from '../components/constants'
-import CheckBox from 'expo-checkbox';
+import ListingLate from '../components/ListingLate'
+import ListingUpcoming from '../components/ListingUpcoming'
+import ListingDone from '../components/ListingDone'
 
 export default function Category({ route }) {
     const [lateTasks, setLateTasks] = useState(null)
@@ -13,7 +15,6 @@ export default function Category({ route }) {
     const [upcomingTasks, setUpcomingTasks] = useState(null)
     const [loading, setLoading] = useState(true)
     const [empty, setEmpty] = useState(false)
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
     const { categoryName, itemCount, tasks } = route.params;
     const color = colors[categoryName];
     const SVG = svgs[categoryName]
@@ -55,19 +56,29 @@ export default function Category({ route }) {
                     </View>
                 </View>
                 <View className='w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
-                    <View className='p-12'>
-                        {lateTasks && (
+                    <View className='p-8'>
+                        {lateTasks && lateTasks.length > 0 && (
                             <View>
-                                <Text className='text-lg tracking-wide opacicty-50'>Late</Text>
-                                {lateTasks.map((task) =>
-                                    <View>
-                                        <Text>{task.title}</Text>
-                                        <CheckBox
-                                            value={toggleCheckBox}
-                                            onValueChange={(newValue) => setToggleCheckBox(newValue)}
-                                        />
-                                    </View>
-                                )}
+                                <Text className='text-lg tracking-wide opacity-50 px-4 pt-4'>Late</Text>
+                                <FlatList
+                                    data={lateTasks}
+                                    renderItem={({ item }) => (
+                                        <ListingLate task={item} />
+                                    )}
+                                    keyExtractor={(item) => item.id}
+                                />
+                            </View>
+                        )}
+                        {upcomingTasks && upcomingTasks.length > 0 && (
+                            <View>
+                                <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Upcoming</Text>
+                                <ListingUpcoming tasks={upcomingTasks} />
+                            </View>
+                        )}
+                        {finishedTasks && finishedTasks.length > 0 && (
+                            <View>
+                                <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Done</Text>
+                                <ListingDone tasks={finishedTasks} />
                             </View>
                         )}
                     </View>
