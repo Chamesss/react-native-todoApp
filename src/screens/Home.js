@@ -10,17 +10,22 @@ import { getFormattedDate } from '../utils/Date'
 import TaskBox from '../components/TaskBox'
 import ModalWindow from '../components/ModalWindow'
 import Add from '../components/Add'
+import { tasks } from '../slices/tasksSlice'
 
 const Home = () => {
-    const todoTasks = data.filter((item) => item.status === 'todo');
-    const completedTasks = data.filter((item) => item.status === 'done');
+    const data = useSelector(tasks)
+    console.log('data === ', data)
+    //const todoTasks = data.filter((item) => item.status === 'todo');
+    //const completedTasks = data.filter((item) => item.status === 'done');
     const dispatch = useDispatch();
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
     const categories = useState(() => {
         const countByCategory = {};
-        data.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1)
+        if (data.length > 0) {
+            data?.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1)
+        }
         return countByCategory;
     })
     const [selectedItemId, setSelectedItemId] = useState(null);
@@ -31,7 +36,7 @@ const Home = () => {
             <View className={`relative flex-1 ${dark ? 'bg-slate-900' : 'bg-[rgb(252,252,252)]'}`}>
                 <View className='flex-row justify-between items-start pt-8 px-8'>
                     <View>
-                        <Text className=' text-start text-xl font-semibold tracking-wider'>Today</Text>
+                        <Text className=' opacity-80 text-xl font-semibold tracking-wider'>Today</Text>
                         <Text className=' opacity-50 mb-5'>{date}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
@@ -39,7 +44,7 @@ const Home = () => {
                     </TouchableOpacity>
                 </View>
                 <View className='mt-4 px-8 pb-4'>
-                    <Text className=' text-3xl font-semibold tracking-widest'>Lists</Text>
+                    <Text className=" opacity-80 text-3xl font-semibold tracking-widest">Lists</Text>
                 </View>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}

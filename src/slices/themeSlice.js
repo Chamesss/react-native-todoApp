@@ -11,15 +11,16 @@ const initialState = {
 export const switchThemeAsync = createAsyncThunk('theme/switchThemeAsync', async (_, { getState }) => {
     const currentState = selectTheme(getState());
     try {
-        await AsyncStorage.setItem('theme', JSON.stringify(!currentState.isDarkMode));
+        await AsyncStorage.setItem('theme', (!currentState).toString());
     } catch (error) {
         return false
     }
-});
+})
 
 export const initializeThemeAsync = createAsyncThunk('theme/initializeThemeAsync', async () => {
     try {
         const theme = await AsyncStorage.getItem('theme');
+        console.log('theme === ', theme)
         return theme === "true" || theme === true;
     } catch (error) {
         await AsyncStorage.setItem('theme', JSON.stringify(false));

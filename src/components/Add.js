@@ -9,7 +9,7 @@ export default function Add() {
         <>
             <View className='absolute bottom-0 right-0'>
                 <TouchableOpacity onPress={() => setModalVisible(!isModalVisible)}>
-                    <View style={styles.dropShadow} className='mr-6 mb-12 w-20 h-20 rounded-full items-center justify-center filter drop-shadow-4xl'>
+                    <View style={styles.dropShadow} className='mr-6 mb-12 w-20 h-20 rounded-full items-center justify-center drop-shadow-4xl'>
                         <Icon2 color='white' name='plus' size={30} />
                     </View>
                 </TouchableOpacity>

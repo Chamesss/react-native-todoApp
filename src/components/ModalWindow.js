@@ -78,7 +78,7 @@ export default function ModalWindow({ exitModal }) {
                             </Pressable> */}
                         <View className='relative'>
                             {taskError && (
-                                <Text className='absolute text-start color-red-600 text-sm'>Add your task here please.</Text>
+                                <Text className='absolute color-red-600 text-sm'>Add your task here please.</Text>
                             )}
                         </View>
                         <View className='border border-black/[.2] my-8' />

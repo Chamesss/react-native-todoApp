@@ -6,10 +6,10 @@ export default function ListingLate({ task }) {
     const [selected, setSelected] = useState(false)
     return (
         <TouchableOpacity onPress={() => setSelected(!selected)}>
-            <View className={`flex-row justify-between items-center p-4 mt-5 ${selected && 'bg-gray-100 rounded-lg'}`}>
+            <View className={`flex-row justify-between items-center p-4 mt-5`}>
                 <View>
-                    <Text className='text-lg'>{task.title}</Text>
-                    <Text className='color-red-500'>
+                    <Text className={`text-lg ${selected && ' font-semibold'}`}>{task.title}</Text>
+                    <Text className={`color-red-500 ${selected && ' font-semibold'}`}>
                         {task.ending.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         {'  '}
                         {task.ending.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}

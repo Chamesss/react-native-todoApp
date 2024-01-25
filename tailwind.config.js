@@ -12,8 +12,14 @@ module.exports = {
           '0 35px 35px rgba(10,182,171,0.4)',
           '0 45px 65px rgba(10,182,171,0.4)'
         ]
-      }
-    }
+      },
+      fontFamily: {
+        Roboto300: ['Roboto_300Light'],
+        Roboto400: ['Roboto_400Regular'],
+        Roboto500: ['Roboto_500Medium'],
+        Roboto700: ['Roboto_700Bold'],
+      },
+    },
   },
   plugins: [],
 }

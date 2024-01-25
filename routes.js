@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectTheme } from './src/slices/themeSlice';
 
 import Home from './src/screens/Home';
@@ -11,13 +11,14 @@ import Draft from './src/screens/Draft';
 import { View } from 'react-native';
 import DrawerElements from './src/components/DrawerElements'
 import Category from './src/screens/Category';
+import DatabaseHelper from './src/utils/Database';
+import { setTasks } from './src/slices/tasksSlice';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 const AppStack = () => {
     const dark = useSelector(selectTheme);
-
     return (
         <Stack.Navigator
             screenOptions={{
@@ -36,7 +37,6 @@ const AppStack = () => {
                 presentation: 'transparentModal',
             }}
         >
-            <Stack.Screen name="SplashScreen" component={SplashScreen} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name='CategoryListing' component={Category} />
         </Stack.Navigator>
@@ -57,9 +57,19 @@ const DrawerStack = () => {
 };
 
 const Routes = () => {
+    const dispatch = useDispatch()
+    const [Loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        DatabaseHelper.getAllTasks((tasksData) => {
+            dispatch(setTasks(tasksData))
+        });
+        setLoading(false)
+    }, []);
+
     return (
         <NavigationContainer>
-            <DrawerStack />
+            {Loading ? (<SplashScreen />) : (<DrawerStack />)}
         </NavigationContainer>
     );
 };
