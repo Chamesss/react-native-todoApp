@@ -10,6 +10,7 @@ import ListingUpcoming from '../components/ListingUpcoming'
 import ListingDone from '../components/ListingDone'
 import { useNavigation } from '@react-navigation/native'
 import { ScrollView } from 'react-native-virtualized-view'
+import { GradientMask } from '../components/GradientMask'
 
 export default function Category({ route }) {
     const [lateTasks, setLateTasks] = useState(null)
@@ -59,6 +60,7 @@ export default function Category({ route }) {
                     </View>
                 </View>
                 <View className='flex-1 w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
+                    <GradientMask />
                     <ScrollView>
                         <View className='p-8'>
                             {lateTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-4 opacity-50'>Late</Text>}

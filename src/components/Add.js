@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     dropShadow: {
         backgroundColor: '#3b82f6',
         shadowColor: 'rgba(10, 182, 171, 0.4)',
-        shadowOffset: { width: 0, height: 4 },
+        //shadowOffset: { width: 4, height: 4 },
         shadowOpacity: 0.8,
         shadowRadius: 4,
         elevation: 8,
