@@ -16,43 +16,66 @@ db.transaction((tx) => {
 });
 
 const DatabaseHelper = {
-    insertTask: (title, created, ending, status, category, callback) => {
-        db.transaction(
-            (tx) => {
-                tx.executeSql(
-                    'INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
-                    [title, created, ending, status, category],
-                    (_, { rowsAffected, insertId }) => {
-                        if (rowsAffected > 0) {
-                            callback(insertId);
-                        } else {
-                            callback(null);
+    insertTask: ({ title, created, ending, status, category }) => {
+        return new Promise((resolve, reject) => {
+            db.transaction(
+                (tx) => {
+                    tx.executeSql(
+                        'INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
+                        [title, created, ending, status, category],
+                        (_, { rowsAffected, insertId }) => {
+                            console.log('Insert ID:', insertId);
+                            if (rowsAffected > 0) {
+                                resolve(insertId);
+                            } else {
+                                reject(new Error('Failed to insert task.'));
+                            }
+                        },
+                        (error) => {
+                            console.error('Error executing SQL:', error);
+                            reject(error);
                         }
-                    },
-                    (error) => console.error(error)
-                );
-            },
-            null,
-            null
-        );
+                    );
+                },
+                null,
+                null
+            );
+        });
     },
 
-    getAllTasks: (callback) => {
-        db.transaction(
-            (tx) => {
-                tx.executeSql(
-                    'SELECT * FROM tasks',
-                    [],
-                    (_, { rows }) => {
-                        callback(rows._array);
+    getAllTasks: async () => {
+        try {
+            console.log('Fetching tasks...');  // displayed
+            let tasks = await new Promise((resolve, reject) => {
+                db.transaction(
+                    (tx) => {
+                        console.log('aaaaa')
+                        tx.executeSql(
+                            'SELECT * FROM tasks',
+                            [],
+                            (_, { rows }) => {
+                                console.log('Tasks fetched successfully.');  // didnt get displayed
+                                resolve(rows._array);
+                            },
+                            (error) => {
+                                console.error('Error executing SQL:', error);
+                                reject(error);
+                            }
+                        );
                     },
-                    (error) => console.error(error)
+                    null,
+                    null
                 );
-            },
-            null,
-            null
-        );
-    },
+            });
+            if (tasks.length === 0) {
+                console.log('No tasks found.');
+                // handle the case when tasks array is empty
+            }
+            return tasks;
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
+    }
 
 };
 

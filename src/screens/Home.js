@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Button, Switch, TouchableOpacity, FlatList, Modal, ScrollView, TouchableHighlight, TouchableOpacityBase } from 'react-native'
+import { Text, View, StyleSheet, Button, Switch, TouchableOpacity, FlatList, Modal, ScrollView, TouchableHighlight, Image } from 'react-native'
 import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectTheme } from '../slices/themeSlice'
@@ -14,22 +14,16 @@ import { tasks } from '../slices/tasksSlice'
 
 const Home = () => {
     const data = useSelector(tasks)
-    console.log('data === ', data)
-    //const todoTasks = data.filter((item) => item.status === 'todo');
-    //const completedTasks = data.filter((item) => item.status === 'done');
-    const dispatch = useDispatch();
+    console.log(data)
+    const count = useState(data.length)
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
     const categories = useState(() => {
-        const countByCategory = {};
-        if (data.length > 0) {
-            data?.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1)
-        }
+        const countByCategory = {}
+        data.length > 0 ? data.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1) : null
         return countByCategory;
     })
-    const [selectedItemId, setSelectedItemId] = useState(null);
-
 
     return (
         <>
@@ -46,43 +40,38 @@ const Home = () => {
                 <View className='mt-4 px-8 pb-4'>
                     <Text className=" opacity-80 text-3xl font-semibold tracking-widest">Lists</Text>
                 </View>
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View className='mt-5 pb-4 justify-center items-center flex-wrap flex-row gap-4'>
-                        <View className='w-48 h-48'>
-                            <TaskBox categoryName={'all'} itemCount={212} tasks={data} />
-                        </View>
-                        {Object.entries(categories[0]).map((item) =>
-                            <View key={item[0]} className='w-48 h-48'>
-                                <TaskBox categoryName={item[0]} itemCount={item[1]} tasks={data.map((i) => ({
-                                    ...i,
-                                    created: i.created.toISOString(),
-                                })).filter((i) => i.category === item[0])} />
+                {count > 0 ? (
+                    <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View className='mt-5 w-full px-8 pb-4 flex-wrap flex-row items-center justify-between gap-2'>
+                            <View className='w-48 h-48'>
+                                <TaskBox categoryName={'all'} itemCount={count} tasks={data} />
                             </View>
-                        )}
-                        {/* <FlatList
-                            data={Object.entries(categories[0])}
-                            renderItem={({ item }) => (
-                                <TaskBox
-                                    categoryName={item[0]}
-                                    itemCount={item[1]}
-                                />
-                            )}
-                            keyExtractor={(item) => item[0]}
-                        /> */}
+                            {categories.length > 0 &&
+                                Object.entries(categories[0]).map((item) => (
+                                    <View key={item[0]} className='w-48 h-48 mt-4'>
+                                        <TaskBox
+                                            categoryName={item[0]}
+                                            itemCount={item[1]}
+                                            tasks={data}
+                                        />
+                                    </View>
+                                ))}
+                        </View>
+                    </ScrollView>
+                ) : (
+                    <View className='flex-1 mb-32 items-center justify-center'>
+                        <Image
+                            source={require('../../assets/note.png')}
+                            style={{ width: 100, height: 100 }}
+                        />
+                        <Text className='text-lg font-semibold tracking-wider mt-4 opacity-50'>Lost in the labyrinth of notes?</Text>
+                        <Text className='text-lg font-semibold tracking-wider opacity-50'>Let's coax them back shall we?</Text>
                     </View>
-                </ScrollView>
+                )}
             </View>
             <Add />
-
-            {/* 
-            <Button
-                onPress={() => { navigation.navigate('Draft') }}
-                title='Go to draft'
-                color={dark ? 'rgb(21 94 117)' : 'rgb(34 211 238)'}
-                accessibilityLabel="Learn more about this purple button"
-            /> */}
         </>
     )
 }

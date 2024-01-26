@@ -4,6 +4,9 @@ import { getFormattedDateWithName, getDateHours } from '../utils/Date'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DatabaseHelper from '../utils/Database'
+import { useDispatch } from 'react-redux'
+import { taskAdded } from '../slices/tasksSlice'
 
 
 export default function ModalWindow({ exitModal }) {
@@ -17,6 +20,7 @@ export default function ModalWindow({ exitModal }) {
     const [hours, setHours] = useState(() => getDateHours())
     const [task, setTask] = useState(null)
     const [taskError, setTaskError] = useState(false)
+    const dispatch = useDispatch()
 
     const handlePickerChange = ({ type }, selectedDate) => {
         setShowPicker(false);
@@ -29,14 +33,41 @@ export default function ModalWindow({ exitModal }) {
     const handleTimerChange = ({ type }, selectedDate) => {
         setShowTimer(false);
         if (type === 'set') {
-            const date = selectedDate.toLocaleString()
-            const hours = date.split(',')
-            setHours(hours[1].slice(1, 6))
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const timeString = selectedDate.toLocaleTimeString('en-US', options);
+            setHours(timeString);
         }
-    }
+    };
 
-    const handleCreateTask = () => {
-        task && task?.length > 0 ? exitModal(false) : setTaskError(true)
+    const handleCreateTask = async () => {
+        if (task && task.length > 0) {
+            const newTask = {
+                title: task,
+                created: new Date().toISOString(),
+                ending: finishDate.toISOString(),
+                status: 'todo',
+                category: 'uncategorized',
+            };
+
+            try {
+                const taskId = await DatabaseHelper.insertTask(newTask);
+                const taskToAdd = {
+                    id: taskId,
+                    title: task,
+                    created: new Date().toISOString(),
+                    ending: finishDate.toISOString(),
+                    status: 'todo',
+                    category: 'uncategorized',
+                }
+                dispatch(taskAdded(taskToAdd));
+                console.log('New task inserted with ID:', taskId);
+                exitModal(false);
+            } catch (error) {
+                console.error('Error inserting task:', error);
+            }
+        } else {
+            setTaskError(true);
+        }
     }
 
     // const confirmIOS = (date) => {

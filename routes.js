@@ -13,6 +13,8 @@ import DrawerElements from './src/components/DrawerElements'
 import Category from './src/screens/Category';
 import DatabaseHelper from './src/utils/Database';
 import { setTasks } from './src/slices/tasksSlice';
+import * as SQLite from 'expo-sqlite';
+
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -59,13 +61,43 @@ const DrawerStack = () => {
 const Routes = () => {
     const dispatch = useDispatch()
     const [Loading, setLoading] = useState(true)
+    const [db, setDb] = useState(SQLite.openDatabase('storage.db'));
 
     useEffect(() => {
-        DatabaseHelper.getAllTasks((tasksData) => {
-            dispatch(setTasks(tasksData))
-        });
+        const getTasks = async () => {
+            await db.transactionAsync(async tx => {
+                await tx.executeSqlAsync(
+                    `CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT,
+                created TEXT,
+                ending TEXT,
+                status TEXT,
+                category TEXT )`
+                );
+            });
+
+            console.log('aaaaaa')
+
+            await db.transactionAsync(async tx => {
+                const result = await tx.executeSqlAsync('SELECT * FROM tasks', []);
+                console.log('Count:', result.rows[0]['COUNT(*)']);
+            }, true);
+
+            //  db.transaction(tx => {
+            //     tx.executeSql('SELECT * FROM tasks', null,
+            //         (txObj, resultSet) => {
+            //             dispatch(setTasks(resultSet.rows._array))
+            //             console.log('AAAAAAA', resultSet)
+            //         },
+            //         (txObj, error) => console.log(error)
+            //     );
+            // });
+        }
+
+        getTasks()
         setLoading(false)
-    }, []);
+    }, [db]);
 
     return (
         <NavigationContainer>

@@ -24,7 +24,7 @@ export const getFormattedDateWithName = () => {
 export const getDateHours = () => {
     const now = new Date();
     now.setHours(now.getHours() + 1);
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const formattedDate = ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
-    return formattedDate
+    const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const defaultTime = now.toLocaleTimeString('en-US', options);
+    return defaultTime
 }
