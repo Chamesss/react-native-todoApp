@@ -4,76 +4,76 @@ import { getFormattedDateWithName, getDateHours } from '../utils/Date'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
-import DatabaseHelper from '../utils/Database'
 import { useDispatch } from 'react-redux'
 import { taskAdded } from '../slices/tasksSlice'
+import * as SQLite from 'expo-sqlite'
 
 
 export default function ModalWindow({ exitModal }) {
     const date = getFormattedDateWithName()
     const [dayName, monthName, year] = date.split(', ');
-    const [selectedStartDate, setSelectedStartDate] = useState(null);
-    const [finishDate, setFinishDate] = useState(new Date())
-    const [showPicker, setShowPicker] = useState(false)
-    const [showTimer, setShowTimer] = useState(false)
     const [newDate, setNewDate] = useState(() => monthName.slice(0, 3) + monthName.slice(-3))
     const [hours, setHours] = useState(() => getDateHours())
+
+
+    const [finishDate, setFinishDate] = useState(new Date(new Date().getTime() + 120 * 60 * 1000));
+    const [showPicker, setShowPicker] = useState(false)
+    const [showTimer, setShowTimer] = useState(false)
     const [task, setTask] = useState(null)
     const [taskError, setTaskError] = useState(false)
-    const dispatch = useDispatch()
+    const db = SQLite.openDatabase('storage.db')
 
     const handlePickerChange = ({ type }, selectedDate) => {
         setShowPicker(false);
         if (type === 'set') {
-            setNewDate(selectedDate.toDateString().slice(4, 10))
-            setFinishDate(selectedDate)
+            const existingHours = finishDate.getHours();
+            const existingMinutes = finishDate.getMinutes();
+            const newFinishDate = new Date(selectedDate);
+            newFinishDate.setHours(existingHours, existingMinutes, 0, 0);
+            setNewDate(selectedDate.toDateString().slice(4, 10));
+            setFinishDate(newFinishDate);
         }
     }
 
     const handleTimerChange = ({ type }, selectedDate) => {
         setShowTimer(false);
         if (type === 'set') {
-            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-            const timeString = selectedDate.toLocaleTimeString('en-US', options);
+            const existingYear = finishDate.getFullYear();
+            const existingMonth = finishDate.getMonth();
+            const existingDay = finishDate.getDate();
+            const newFinishDate = new Date(existingYear, existingMonth, existingDay, selectedDate.getHours() + 1, selectedDate.getMinutes(), 0, 0);
+            const timeString = selectedDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
             setHours(timeString);
+            setFinishDate(newFinishDate);
         }
     };
 
     const handleCreateTask = async () => {
         if (task && task.length > 0) {
-            const newTask = {
-                title: task,
-                created: new Date().toISOString(),
-                ending: finishDate.toISOString(),
-                status: 'todo',
-                category: 'uncategorized',
-            };
-
-            try {
-                const taskId = await DatabaseHelper.insertTask(newTask);
-                const taskToAdd = {
-                    id: taskId,
-                    title: task,
-                    created: new Date().toISOString(),
-                    ending: finishDate.toISOString(),
-                    status: 'todo',
-                    category: 'uncategorized',
-                }
-                dispatch(taskAdded(taskToAdd));
-                console.log('New task inserted with ID:', taskId);
-                exitModal(false);
-            } catch (error) {
-                console.error('Error inserting task:', error);
-            }
+            const currentDate = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
+            const status = 'todo'
+            const category = 'music'
+            db.transaction(tx => {
+                tx.executeSql('INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
+                    [task, currentDate, finishDate.toISOString(), status, category],
+                    (txObj, resultSet) => {
+                        console.log(resultSet.insertId)
+                        exitModal(false);
+                    },
+                    (txObj, error) => console.log(error)
+                )
+            })
+            db.transaction(tx => {
+                tx.executeSql('SELECT * FROM tasks', null,
+                    (txObj, resultSet) => console.log(resultSet.rows._array),
+                    (txObj, error) => console.log(error)
+                );
+            })
         } else {
-            setTaskError(true);
+            setTaskError(true)
         }
     }
 
-    // const confirmIOS = (date) => {
-    //     setFinishDate(date)
-    //     setShowPicker(false)
-    // }
     return (
 
         <View className='flex-1 relative items-center w-full h-full pt-10 bg-white'>
@@ -81,10 +81,7 @@ export default function ModalWindow({ exitModal }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1, width: '100%' }}
             >
-                <ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                    }}
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}
                     keyboardShouldPersistTaps="handled"
                 >
                     <View className='relative flex-row px-8 items-center w-full justify-center'>
@@ -104,9 +101,6 @@ export default function ModalWindow({ exitModal }) {
                             onChangeText={(text) => (setTask(text), setTaskError(false))}
                             value={task}
                         />
-                        {/* <Pressable onPress={() => setShowPicker(!showPicker)}>
-                            <Icon onPressIn={() => setShowPicker(!showPicker)} name='calendar-today' color='white' size={40} />
-                            </Pressable> */}
                         <View className='relative'>
                             {taskError && (
                                 <Text className='absolute color-red-600 text-sm'>Add your task here please.</Text>

@@ -29,7 +29,7 @@ const ListingUpcoming = ({ task }) => {
                 <View>
                     <Text className={`text-lg ${selected && ' font-semibold'}`}>{task.title}</Text>
                     <Text className={`${selected && ' font-semibold'}`}>
-                        {task.ending.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {task.ending.slice(11, 16)}
                         {'  '}
                         {dateString}
                     </Text>

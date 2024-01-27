@@ -14,8 +14,9 @@ import { tasks } from '../slices/tasksSlice'
 
 const Home = () => {
     const data = useSelector(tasks)
-    console.log(data)
-    const count = useState(data.length)
+    console.log('data === ', data)
+    const count = data?.tasks?.length
+    console.log(count)
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
@@ -46,7 +47,7 @@ const Home = () => {
                     >
                         <View className='mt-5 w-full px-8 pb-4 flex-wrap flex-row items-center justify-between gap-2'>
                             <View className='w-48 h-48'>
-                                <TaskBox categoryName={'all'} itemCount={count} tasks={data} />
+                                <TaskBox categoryName={'all'} itemCount={count} tasks={data.tasks} />
                             </View>
                             {categories.length > 0 &&
                                 Object.entries(categories[0]).map((item) => (
