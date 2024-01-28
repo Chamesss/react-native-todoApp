@@ -56,7 +56,6 @@ export default function ModalWindow({ exitModal }) {
         if (task && task.length > 0) {
             const currentDate = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
             const status = 'todo'
-            const category = 'home'
             db.transaction(tx => {
                 tx.executeSql('INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
                     [task, currentDate, finishDate.toISOString(), status, category],
@@ -75,12 +74,12 @@ export default function ModalWindow({ exitModal }) {
                     (txObj, error) => console.log(error)
                 )
             })
-            db.transaction(tx => {
-                tx.executeSql('SELECT * FROM tasks', null,
-                    (txObj, resultSet) => console.log(resultSet.rows._array),
-                    (txObj, error) => console.log(error)
-                );
-            })
+            // db.transaction(tx => {
+            //     tx.executeSql('SELECT * FROM tasks', null,
+            //         (txObj, resultSet) => console.log(resultSet.rows._array),
+            //         (txObj, error) => console.log(error)
+            //     );
+            // })
         } else {
             setTaskError(true)
         }

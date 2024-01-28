@@ -7,13 +7,7 @@ const SplashScreen = () => {
     const dark = useSelector(selectTheme)
     return (
         <View className={`flex-1 items-center justify-center ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
-            <StatusBar
-                translucent={true}
-                backgroundColor={dark ? 'rgb(15 23 42)' : 'rgb(248 250 252)'}
-                barStyle={dark ? 'light-content' : 'dark-content'}
-            />
             <Image source={require('../../assets/favicon.png')} />
-            <ActivityIndicator size="small" color="#0000ff" />
         </View>
     );
 };

@@ -20,7 +20,6 @@ export const switchThemeAsync = createAsyncThunk('theme/switchThemeAsync', async
 export const initializeThemeAsync = createAsyncThunk('theme/initializeThemeAsync', async () => {
     try {
         const theme = await AsyncStorage.getItem('theme');
-        console.log('theme === ', theme)
         return theme === "true" || theme === true;
     } catch (error) {
         await AsyncStorage.setItem('theme', JSON.stringify(false));

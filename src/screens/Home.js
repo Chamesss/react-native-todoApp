@@ -13,9 +13,8 @@ import Add from '../components/Add'
 import { tasks } from '../slices/tasksSlice'
 
 const Home = () => {
-
     const data = useSelector(tasks)
-    const [count, setCount] = useState(data?.tasks?.length)
+    const [count, setCount] = useState(data.tasks?.length)
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()

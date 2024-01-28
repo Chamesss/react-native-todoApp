@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native'
 export default function TaskBox({ categoryName, itemCount, tasks }) {
     const SVG = svgs[categoryName]
     const navigation = useNavigation()
-    console.log(tasks[0])
     return (
         <Pressable onPress={() => navigation.navigate('CategoryListing', { categoryName, itemCount, tasks })}>
             <View className='bg-white white p-4 rounded-md shadow-[0_15px_20px_-10px_rgba(0,0,0,0.3)]'>

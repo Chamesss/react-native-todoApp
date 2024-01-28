@@ -1,9 +1,7 @@
 import { Text, View, TouchableOpacity, Modal } from 'react-native'
 import React, { useEffect, useState } from 'react'
-//import Modal from "react-native-simple-modal";
 import { svgs } from './constants';
 import Icon from 'react-native-vector-icons/Octicons'
-// eslint-disable-next-line react-native/no-inline-styles
 
 export default function CategoryModal({ open, setOpen, category, setCategory }) {
     const [name, setName] = useState(null)
@@ -20,8 +18,7 @@ export default function CategoryModal({ open, setOpen, category, setCategory }) 
             }}
             style={{ alignItems: 'center' }}
         >
-            <View className=' bg-red-500 relative opacity-50 flex-1 w-full h-full' />
-            <View style={{ backgroundColor: 'rgba(0,0,0,.5)' }} className='w-full h-full px-4 justify-center items-center'>
+            <View style={{ backgroundColor: 'rgba(0,0,0,.6)' }} className='w-full h-full px-4 justify-center items-center' onPress={() => console.log('aaaaaaaaaaaa')}>
                 <View className='bg-white rounded-md px-2 py-4'>
                     <View className='relative flex-row justify-center'>
                         <Text className='text-lg font-semibold mb-4'>Select a category</Text>
@@ -36,7 +33,7 @@ export default function CategoryModal({ open, setOpen, category, setCategory }) 
                             if (svgName !== 'all') {
                                 return (
                                     <TouchableOpacity key={svg[0]} onPress={() => setName(svgName)}>
-                                        <View style={{ boxSizing: 'border-box' }} className={`flex-row gap-2 items-center py-1 px-4 ${name === svgName ? 'border-[#6c6c6ca3] border-2 rounded-full bg-white' : 'border-2 border-transparent'}`}>
+                                        <View style={{ boxSizing: 'border-box' }} className={`flex-row gap-2 items-center py-1 px-4 ${name === svgName ? 'border-[#6c6c6c5c] border rounded-full bg-white shadow' : 'border border-transparent'}`}>
                                             <SVG width={30} height={30} />
                                             <Text>{svgName[0].toUpperCase() + svgName.slice(1)}</Text>
                                         </View>
