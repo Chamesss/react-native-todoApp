@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, Button, Switch, TouchableOpacity, FlatList, Modal, ScrollView, TouchableHighlight, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { selectTheme } from '../slices/themeSlice'
 import { switchThemeAsync } from '../slices/themeSlice'
@@ -13,18 +13,20 @@ import Add from '../components/Add'
 import { tasks } from '../slices/tasksSlice'
 
 const Home = () => {
+
     const data = useSelector(tasks)
-    console.log('data === ', data)
-    const count = data?.tasks?.length
-    console.log(count)
+    const [count, setCount] = useState(data?.tasks?.length)
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
-    const categories = useState(() => {
-        const countByCategory = {}
-        data.length > 0 ? data.forEach((item) => countByCategory[item.category] = (countByCategory[item.category] || 0) + 1) : null
-        return countByCategory;
-    })
+    const [categories, setCategories] = useState(null)
+
+    useEffect(() => {
+        setCount(data?.tasks?.length)
+        let countByCategory = {}
+        data.tasks?.length > 0 ? data.tasks.forEach((task) => countByCategory[task.category] = (countByCategory[task.category] || 0) + 1) : null
+        setCategories(countByCategory)
+    }, [data])
 
     return (
         <>
@@ -46,19 +48,22 @@ const Home = () => {
                         showsVerticalScrollIndicator={false}
                     >
                         <View className='mt-5 w-full px-8 pb-4 flex-wrap flex-row items-center justify-between gap-2'>
-                            <View className='w-48 h-48'>
+                            <View className='w-44 h-44'>
                                 <TaskBox categoryName={'all'} itemCount={count} tasks={data.tasks} />
                             </View>
-                            {categories.length > 0 &&
-                                Object.entries(categories[0]).map((item) => (
-                                    <View key={item[0]} className='w-48 h-48 mt-4'>
-                                        <TaskBox
-                                            categoryName={item[0]}
-                                            itemCount={item[1]}
-                                            tasks={data}
-                                        />
-                                    </View>
-                                ))}
+                            {categories &&
+                                Object.entries(categories).map((item) => {
+                                    const tasks = data.tasks.filter((task) => task.category === item[0])
+                                    return (
+                                        <View key={item[0]} className='w-44 h-44 mt-4'>
+                                            <TaskBox
+                                                categoryName={item[0]}
+                                                itemCount={item[1]}
+                                                tasks={tasks}
+                                            />
+                                        </View>
+                                    )
+                                })}
                         </View>
                     </ScrollView>
                 ) : (

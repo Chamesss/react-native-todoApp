@@ -13,10 +13,7 @@ const Routes = () => {
     useEffect(() => {
 
         db.transaction(tx => {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, created TEXT, ending TEXT, status TEXT, category TEXT)', null,
-                (txObj, resultSet) => console.log(resultSet.rows._array),
-                (txObj, error) => console.log(error)
-            )
+            tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, created TEXT, ending TEXT, status TEXT, category TEXT)')
         });
 
         db.transaction(tx => {
