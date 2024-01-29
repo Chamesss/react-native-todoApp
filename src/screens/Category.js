@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Add from '../components/Add'
 import { colors } from '../components/constants'
 import Icon from 'react-native-vector-icons/AntDesign'
 import Icon2 from 'react-native-vector-icons/Entypo'
+import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons'
 import { svgs } from '../components/constants'
 import ListingLate from '../components/ListingLate'
 import ListingUpcoming from '../components/ListingUpcoming'
@@ -11,17 +12,30 @@ import ListingDone from '../components/ListingDone'
 import { useNavigation } from '@react-navigation/native'
 import { ScrollView } from 'react-native-virtualized-view'
 import { GradientMask } from '../components/GradientMask'
+import { useDispatch, useSelector } from 'react-redux'
+import { tasksSelected, taskReset } from '../slices/selectionSlice'
 
 export default function Category({ route }) {
+
     const [lateTasks, setLateTasks] = useState(null)
     const [finishedTasks, setFinishedTasks] = useState(null)
     const [upcomingTasks, setUpcomingTasks] = useState(null)
     const [loading, setLoading] = useState(true)
     const [empty, setEmpty] = useState(false)
+    const [edit, setEdit] = useState(false)
+    const [actionDelete, setActionDelete] = useState(false)
     const { categoryName, itemCount, tasks } = route.params;
     const color = colors[categoryName];
     const SVG = svgs[categoryName]
     const navigation = useNavigation()
+    const selectedTasks = useSelector(tasksSelected)
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        return () => {
+            dispatch(taskReset());
+        }
+    }, [])
 
     useEffect(() => {
         if (tasks.length > 0) {
@@ -43,16 +57,23 @@ export default function Category({ route }) {
         }
         setLoading(false)
     }, [tasks])
+
+    useEffect(() => {
+        selectedTasks.tasksSelected.length === 0 && setEdit(false)
+        selectedTasks.tasksSelected.length === 1 && (setEdit(true), setActionDelete(true))
+        selectedTasks.tasksSelected.length > 1 && (setEdit(false), setActionDelete(true))
+    }, [selectedTasks])
+
     return (
         <>
             {!loading && <View className={`relative flex-1 ${color}`}>
-                <View className='px-8 pt-8 pb-4'>
+                <View className='px-8 pt-8 pb-1'>
                     <View className='flex-row justify-between items-center'>
                         <Icon name='left' color='white' size={25} onPress={() => navigation.goBack()} />
                         <Icon2 name='dots-three-vertical' color='white' size={25} />
                     </View>
                     <View className='p-4'>
-                        <View className='bg-white rounded-full w-16 h-16 items-center justify-center mt-14'>
+                        <View className={`bg-white rounded-full w-16 h-16 items-center justify-center mt-14`}>
                             <SVG style={{ marginLeft: 5, marginTop: 5 }} width={40} height={40} />
                         </View>
                         <Text className='color-white text-4xl font-semibold mt-4'>{categoryName.charAt(0).toUpperCase() + categoryName.slice(1)}</Text>
@@ -72,30 +93,24 @@ export default function Category({ route }) {
                         </View>
                     </ScrollView>
                 </View>
+                {selectedTasks.tasksSelected.length > 0 &&
+                    <View className='flex-row justify-around bg-white p-4 w-full z-50 absolute bottom-0'>
+                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1}>
+                            <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
+                                <Icon3 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
+                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <View className='items-center'>
+                                <Icon3 name='delete' size={25} color='#D11A2A' />
+                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Delete</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                }
                 <Add />
-                {/* <View className='p-8'>
-                            {lateTasks && lateTasks.length > 0 && (
-                                <View>
-                                    <Text className='text-lg tracking-wide opacity-50 px-4 pt-4'>Late</Text>
-                                    {lateTasks.map((item) => <ListingLate key={item.id} task={item} />)}
-                                </View>
-                            )}
-                            {upcomingTasks && upcomingTasks.length > 0 && (
-                                <View>
-                                    <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Upcoming</Text>
-                                    <ListingUpcoming tasks={upcomingTasks} />
-                                </View>
-                            )}
-                            {finishedTasks && finishedTasks.length > 0 && (
-                                <View>
-                                    <Text className='text-lg tracking-wide opacity-50 mt-8 px-4'>Done</Text>
-                                    <ListingDone tasks={finishedTasks} />
-                                </View>
-                            )}
-                        </View> */}
             </View>}
         </>
     )
 }
-
-const styles = StyleSheet.create({})
