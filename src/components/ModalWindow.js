@@ -74,12 +74,6 @@ export default function ModalWindow({ exitModal }) {
                     (txObj, error) => console.log(error)
                 )
             })
-            // db.transaction(tx => {
-            //     tx.executeSql('SELECT * FROM tasks', null,
-            //         (txObj, resultSet) => console.log(resultSet.rows._array),
-            //         (txObj, error) => console.log(error)
-            //     );
-            // })
         } else {
             setTaskError(true)
         }

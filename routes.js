@@ -23,15 +23,22 @@ const Routes = () => {
         }
 
         db.transaction(tx => {
-            tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, created TEXT, ending TEXT, status TEXT, category TEXT)')
+            console.log("starting")
+            tx.executeSql('CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, created TEXT, ending TEXT, status TEXT, category TEXT)', null,
+                (txObj, resultSet) => console.log(resultSet),
+                (txObj, error) => console.log(error)
+            )
         });
+
 
         db.transaction(tx => {
             tx.executeSql('SELECT * FROM tasks', null,
-                (txObj, resultSet) => setData(resultSet.rows._array).then(() => setLoading(false)),
+                (txObj, resultSet) => setData(resultSet.rows._array).then(() => setLoading(false)).catch((error) => console.log(error)),
                 (txObj, error) => console.log(error)
             );
         })
+
+        //setLoading(false)
 
 
     }, [])

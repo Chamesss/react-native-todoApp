@@ -14,6 +14,9 @@ import { ScrollView } from 'react-native-virtualized-view'
 import { GradientMask } from '../components/GradientMask'
 import { useDispatch, useSelector } from 'react-redux'
 import { tasksSelected, taskReset } from '../slices/selectionSlice'
+import Animated from 'react-native-reanimated'
+import { useSlideAnimation } from './Animations/CategoryAnimations'
+import { TasksFilter } from '../helpers/TasksFilterHelper'
 
 export default function Category({ route }) {
 
@@ -30,6 +33,7 @@ export default function Category({ route }) {
     const navigation = useNavigation()
     const selectedTasks = useSelector(tasksSelected)
     const dispatch = useDispatch()
+    const { animatedStyle, hidingStyle, startAnimation } = useSlideAnimation();
 
     useEffect(() => {
         return () => {
@@ -38,17 +42,12 @@ export default function Category({ route }) {
     }, [])
 
     useEffect(() => {
+        startAnimation(selectedTasks.tasksSelected.length);
+    }, [selectedTasks.tasksSelected.length]);
+
+    useEffect(() => {
         if (tasks.length > 0) {
-            const currentTime = new Date();
-            const lateTasks = tasks.filter(task => {
-                const taskEndingTime = new Date(task.ending);
-                return taskEndingTime < currentTime && task.status === 'todo'
-            })
-            const finishedTasks = tasks.filter(task => task.status === 'done')
-            const upcomingTasks = tasks.filter(task => {
-                const taskEndingTime = new Date(task.ending);
-                return taskEndingTime > currentTime && task.status === 'todo'
-            })
+            const { lateTasks, finishedTasks, upcomingTasks } = TasksFilter(tasks);
             setLateTasks(lateTasks)
             setFinishedTasks(finishedTasks)
             setUpcomingTasks(upcomingTasks)
@@ -93,23 +92,23 @@ export default function Category({ route }) {
                         </View>
                     </ScrollView>
                 </View>
-                {selectedTasks.tasksSelected.length > 0 &&
-                    <View className='flex-row justify-around bg-white p-4 w-full z-50 absolute bottom-0'>
-                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1}>
-                            <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
-                                <Icon3 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
-                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity>
-                            <View className='items-center'>
-                                <Icon3 name='delete' size={25} color='#D11A2A' />
-                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Delete</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                }
-                <Add />
+                <Animated.View className='flex-row bg-slate-100 justify-around p-4 w-full z-50 absolute' style={[{ bottom: -100 }, animatedStyle]}>
+                    <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1}>
+                        <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
+                            <Icon3 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
+                            <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <View className='items-center'>
+                            <Icon3 name='delete' size={25} color='#D11A2A' />
+                            <Text className='mt-1 text-lg font-semibold color-gray-700'>Delete ({selectedTasks.tasksSelected.length})</Text>
+                        </View>
+                    </TouchableOpacity>
+                </Animated.View>
+                <Animated.View style={[{ right: 0 }, hidingStyle]}>
+                    <Add />
+                </Animated.View>
             </View>}
         </>
     )

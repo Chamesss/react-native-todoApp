@@ -24,6 +24,7 @@ const Home = () => {
         setCount(data?.tasks?.length)
         let countByCategory = {}
         data.tasks?.length > 0 ? data.tasks.forEach((task) => countByCategory[task.category] = (countByCategory[task.category] || 0) + 1) : null
+        delete countByCategory['undefined']
         setCategories(countByCategory)
     }, [data])
 
