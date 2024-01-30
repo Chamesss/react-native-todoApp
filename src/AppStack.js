@@ -3,6 +3,7 @@ import { selectTheme } from "./slices/themeSlice";
 import { createStackNavigator } from '@react-navigation/stack';
 import Home from "./screens/Home";
 import Category from "./screens/Category";
+import EditTask from "./screens/EditTask";
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,7 @@ export default AppStack = () => {
         >
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name='CategoryListing' component={Category} />
+            <Stack.Screen name="EditTask" component={EditTask} />
         </Stack.Navigator>
     );
 };
