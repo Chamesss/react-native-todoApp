@@ -1,26 +1,28 @@
 import { KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View, TextInput, Pressable, Platform, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { getFormattedDateWithName, getDateHours } from '../utils/Date'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import React, { useState } from 'react'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux'
-import { taskAdded } from '../slices/tasksSlice'
 import * as SQLite from 'expo-sqlite'
 import CategoryModal from './CategoryModal'
+import { TimerSetter, DateSetter } from '../helpers/TasksTimerHelper'
+import { AddTaskHelper } from '../helpers/DatabaseActionsHelper'
 
 
 export default function ModalWindow({ exitModal }) {
-    const date = getFormattedDateWithName()
-    const [dayName, monthName, year] = date.split(', ');
-    const [newDate, setNewDate] = useState(() => monthName.slice(0, 3) + monthName.slice(-3))
-    const [hours, setHours] = useState(() => getDateHours())
-
-
+    const [newDate, setNewDate] = useState(() => new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+    }))
+    const [hours, setHours] = useState(() => new Date(Date.now() + 60 * 60 * 1000).toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+    }))
     const [finishDate, setFinishDate] = useState(new Date(new Date().getTime() + 120 * 60 * 1000));
     const [showPicker, setShowPicker] = useState(false)
     const [showTimer, setShowTimer] = useState(false)
-    const [task, setTask] = useState(null)
+    const [title, setTitle] = useState(null)
     const [taskError, setTaskError] = useState(false)
     const [open, setOpen] = useState(false)
     const [category, setCategory] = useState('undefined')
@@ -30,10 +32,7 @@ export default function ModalWindow({ exitModal }) {
     const handlePickerChange = ({ type }, selectedDate) => {
         setShowPicker(false);
         if (type === 'set') {
-            const existingHours = finishDate.getHours();
-            const existingMinutes = finishDate.getMinutes();
-            const newFinishDate = new Date(selectedDate);
-            newFinishDate.setHours(existingHours, existingMinutes, 0, 0);
+            const newFinishDate = DateSetter(finishDate, selectedDate)
             setNewDate(selectedDate.toDateString().slice(4, 10));
             setFinishDate(newFinishDate);
         }
@@ -42,41 +41,16 @@ export default function ModalWindow({ exitModal }) {
     const handleTimerChange = ({ type }, selectedDate) => {
         setShowTimer(false);
         if (type === 'set') {
-            const existingYear = finishDate.getFullYear();
-            const existingMonth = finishDate.getMonth();
-            const existingDay = finishDate.getDate();
-            const newFinishDate = new Date(existingYear, existingMonth, existingDay, selectedDate.getHours() + 1, selectedDate.getMinutes(), 0, 0);
-            const timeString = selectedDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const { timeString, newFinishDate } = TimerSetter(finishDate, selectedDate)
             setHours(timeString);
             setFinishDate(newFinishDate);
         }
     };
 
-    const handleCreateTask = async () => {
-        if (task && task.length > 0) {
-            const currentDate = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
-            const status = 'todo'
-            db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
-                    [task, currentDate, finishDate.toISOString(), status, category],
-                    (txObj, resultSet) => {
-                        const task = {
-                            id: resultSet.insertId,
-                            title: task,
-                            created: currentDate,
-                            ending: finishDate.toISOString(),
-                            status: status,
-                            category: category
-                        }
-                        dispatch(taskAdded(task))
-                        exitModal(false);
-                    },
-                    (txObj, error) => console.log(error)
-                )
-            })
-        } else {
+    const handleCreateTask = () => {
+        title.length > 0 ?
+            AddTaskHelper(db, title, finishDate, category, dispatch, exitModal) :
             setTaskError(true)
-        }
     }
 
     return (
@@ -103,8 +77,8 @@ export default function ModalWindow({ exitModal }) {
                             multiline={true}
                             numberOfLines={4}
                             textAlignVertical="top"
-                            onChangeText={(text) => (setTask(text), setTaskError(false))}
-                            value={task}
+                            onChangeText={(text) => (setTitle(text), setTaskError(false))}
+                            value={title}
                         />
                         <View className='relative'>
                             {taskError && (
@@ -147,6 +121,7 @@ export default function ModalWindow({ exitModal }) {
                             }}
                         />
                     )}
+
                     {showPicker && Platform.OS === 'ios' && (
                         <View className='flex-row justify-around'>
                             <TouchableOpacity onPress={() => setShowPicker(!showPicker)}>
@@ -169,6 +144,7 @@ export default function ModalWindow({ exitModal }) {
                             }}
                         />
                     )}
+
                 </ScrollView>
             </KeyboardAvoidingView>
             <View className=' justify-end w-full'>
@@ -178,6 +154,5 @@ export default function ModalWindow({ exitModal }) {
             </View>
             <CategoryModal open={open} setOpen={setOpen} category={category} setCategory={setCategory} />
         </View>
-
     )
 }

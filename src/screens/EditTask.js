@@ -1,51 +1,52 @@
-import { KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View, TextInput, Pressable, Platform, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { getFormattedDateWithName, getDateHours } from '../utils/Date'
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import {
+    KeyboardAvoidingView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
+    TextInput,
+    Pressable,
+    Platform
+} from 'react-native'
+import { useState } from 'react'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux'
-import { taskAdded } from '../slices/tasksSlice'
 import * as SQLite from 'expo-sqlite'
 import CategoryModal from '../components/CategoryModal'
 import { useNavigation } from '@react-navigation/native'
+import { TimerSetter, DateSetter } from '../helpers/TasksTimerHelper'
+import { EditTaskHelper } from '../helpers/DatabaseActionsHelper';
 
 export default function EditTask({ route }) {
-    const [passedTask] = route.params?.task
-    const [newDate, setNewDate] = useState(() => new Date(passedTask.ending).toLocaleDateString('en-US', {
+    const { EditTask } = route.params
+    const [newDate, setNewDate] = useState(() => new Date(EditTask.ending).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
     }))
     const [hours, setHours] = useState(() => {
-        const endingTime = new Date(passedTask.ending);
+        const endingTime = new Date(EditTask.ending);
         endingTime.setHours(endingTime.getHours() - 1);
         return endingTime.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
         });
     });
-
-
-
-    const [finishDate, setFinishDate] = useState(new Date(new Date(passedTask.ending)))
+    const [finishDate, setFinishDate] = useState(new Date(new Date(EditTask.ending)))
     const [showPicker, setShowPicker] = useState(false)
     const [showTimer, setShowTimer] = useState(false)
-    const [task, setTask] = useState(null)
+    const [category, setCategory] = useState(EditTask.category)
+    const [title, setTitle] = useState(EditTask.title)
     const [taskError, setTaskError] = useState(false)
     const [open, setOpen] = useState(false)
-    const [category, setCategory] = useState('undefined')
-    const db = SQLite.openDatabase('storage.db')
     const dispatch = useDispatch()
     const navigation = useNavigation()
-
+    const db = SQLite.openDatabase('storage.db')
 
     const handlePickerChange = ({ type }, selectedDate) => {
         setShowPicker(false);
         if (type === 'set') {
-            const existingHours = finishDate.getHours();
-            const existingMinutes = finishDate.getMinutes();
-            const newFinishDate = new Date(selectedDate);
-            newFinishDate.setHours(existingHours, existingMinutes, 0, 0);
+            const newFinishDate = DateSetter(finishDate, selectedDate)
             setNewDate(selectedDate.toDateString().slice(4, 10));
             setFinishDate(newFinishDate);
         }
@@ -54,45 +55,20 @@ export default function EditTask({ route }) {
     const handleTimerChange = ({ type }, selectedDate) => {
         setShowTimer(false);
         if (type === 'set') {
-            const existingYear = finishDate.getFullYear();
-            const existingMonth = finishDate.getMonth();
-            const existingDay = finishDate.getDate();
-            const newFinishDate = new Date(existingYear, existingMonth, existingDay, selectedDate.getHours() + 1, selectedDate.getMinutes(), 0, 0);
-            const timeString = selectedDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const { timeString, newFinishDate } = TimerSetter(finishDate, selectedDate)
             setHours(timeString);
             setFinishDate(newFinishDate);
         }
     };
 
-    const handleCreateTask = async () => {
-        if (task && task.length > 0) {
-            const currentDate = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
-            const status = 'todo'
-            db.transaction(tx => {
-                tx.executeSql('INSERT INTO tasks (title, created, ending, status, category) VALUES (?, ?, ?, ?, ?)',
-                    [task, currentDate, finishDate.toISOString(), status, category],
-                    (txObj, resultSet) => {
-                        const task = {
-                            id: resultSet.insertId,
-                            title: task,
-                            created: currentDate,
-                            ending: finishDate.toISOString(),
-                            status: status,
-                            category: category
-                        }
-                        dispatch(taskAdded(task))
-                        exitModal(false);
-                    },
-                    (txObj, error) => console.log(error)
-                )
-            })
-        } else {
+    const handleCreateTask = () => {
+        const date = finishDate.toISOString()
+        title.length > 0 ?
+            EditTaskHelper(db, title, date, category, EditTask.id, dispatch, navigation) :
             setTaskError(true)
-        }
     }
 
     return (
-
         <View className='flex-1 relative items-center w-full h-full pt-10 bg-white'>
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -102,7 +78,7 @@ export default function EditTask({ route }) {
                     keyboardShouldPersistTaps="handled"
                 >
                     <View className='relative flex-row px-8 items-center w-full justify-center'>
-                        <Text className='color-black text-2xl tracking-wide'>{passedTask.title}</Text>
+                        <Text className='color-black text-2xl tracking-wide'>{EditTask.title}</Text>
                         <Icon2 name='x' size={35} style={{ position: 'absolute', right: 22 }} color='black'
                             onPress={() => navigation.goBack()}
                         />
@@ -115,8 +91,8 @@ export default function EditTask({ route }) {
                             multiline={true}
                             numberOfLines={4}
                             textAlignVertical="top"
-                            onChangeText={(text) => (setTask(text), setTaskError(false))}
-                            value={task}
+                            onChangeText={(text) => (setTitle(text), setTaskError(false))}
+                            value={title}
                         />
                         <View className='relative'>
                             {taskError && (
@@ -159,6 +135,7 @@ export default function EditTask({ route }) {
                             }}
                         />
                     )}
+
                     {showPicker && Platform.OS === 'ios' && (
                         <View className='flex-row justify-around'>
                             <TouchableOpacity onPress={() => setShowPicker(!showPicker)}>
@@ -181,6 +158,7 @@ export default function EditTask({ route }) {
                             }}
                         />
                     )}
+
                 </ScrollView>
             </KeyboardAvoidingView>
             <View className=' justify-end w-full'>
@@ -190,6 +168,5 @@ export default function EditTask({ route }) {
             </View>
             <CategoryModal open={open} setOpen={setOpen} category={category} setCategory={setCategory} />
         </View>
-
     )
 }

@@ -26,10 +26,25 @@ export const taskSlice = createSlice({
                 ...state,
                 tasks: updatedTasks,
             }
+        },
+        taskEdited(state, action) {
+            const task = action.payload
+            const index = state.tasks.findIndex((t) => t.id === task.id)
+            const newState = {
+                ...state,
+                tasks: [...state.tasks],
+            };
+            newState.tasks[index] = {
+                ...newState.tasks[index],
+                category: task.category,
+                title: task.title,
+                finishDate: task.finishDate,
+            };
+            return newState;
         }
     },
 });
 
-export const { setTasks, taskAdded, taskDeleted } = taskSlice.actions;
+export const { setTasks, taskAdded, taskDeleted, taskEdited } = taskSlice.actions;
 export const tasks = (state) => state.tasks
 export default taskSlice.reducer;

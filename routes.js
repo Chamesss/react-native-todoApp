@@ -34,9 +34,6 @@ const Routes = () => {
             );
         })
 
-        //setLoading(false)
-
-
     }, [])
 
     return (

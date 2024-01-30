@@ -30,7 +30,6 @@ export default function Category({ route }) {
     const [Show, setShow] = useState(false)
     const [task, setTask] = useState(null)
     const { categoryName, itemCount, tasks } = route.params;
-    console.log(tasks)
     const color = colors[categoryName];
     const SVG = svgs[categoryName]
     const navigation = useNavigation()
@@ -67,12 +66,6 @@ export default function Category({ route }) {
         setLoading(false)
     }, [tasks])
 
-    useEffect(() => {
-        selectedTasks.tasksSelected.length === 0 && setEdit(false)
-        selectedTasks.tasksSelected.length === 1 && (setEdit(true), setTask(() => tasks.filter((t) => t.id === selectedTasks.tasksSelected[0])), setActionDelete(true))
-        selectedTasks.tasksSelected.length > 1 && (setEdit(false), setActionDelete(true))
-    }, [selectedTasks])
-
     return (
         <>
             {!loading && <View className={`relative flex-1 ${color}`}>
@@ -104,7 +97,10 @@ export default function Category({ route }) {
                 </View>
                 {Show &&
                     <Animated.View className='flex-row bg-slate-100 justify-around p-4 w-full z-50 absolute' style={[{ bottom: -100 }, animatedStyle]}>
-                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1} onPress={() => navigation.navigate('EditTask', { task: task })}>
+                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1} onPress={() => {
+                            const selectedTask = tasks.find(task => task.id === selectedTasks.tasksSelected[0]);
+                            navigation.navigate('EditTask', { EditTask: selectedTask });
+                        }}>
                             <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
                                 <Icon3 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
                                 <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
