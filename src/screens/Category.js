@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import Add from '../components/Add'
 import { colors } from '../components/constants'
 import Icon from 'react-native-vector-icons/AntDesign'
-import Icon2 from 'react-native-vector-icons/Entypo'
 import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons'
 import { svgs } from '../components/constants'
 import ListingLate from '../components/ListingLate'
@@ -20,6 +19,7 @@ import { TasksFilter } from '../helpers/TasksFilterHelper'
 import { tasks } from '../slices/tasksSlice'
 import { deleteTaskByIdHelper } from '../helpers/DatabaseActionsHelper'
 import * as SQLite from 'expo-sqlite'
+import DropDown from '../components/DropDown'
 
 export default function Category({ route }) {
 
@@ -47,7 +47,9 @@ export default function Category({ route }) {
     }, [])
 
     useEffect(() => {
-        setTasks(() => data.tasks.filter((item) => item.category === categoryName))
+        categoryName !== 'all' ?
+            setTasks(() => data.tasks.filter((item) => item.category === categoryName)) :
+            setTasks(data.tasks)
     }, [data])
 
     useEffect(() => {
@@ -85,7 +87,7 @@ export default function Category({ route }) {
                 <View className='px-8 pt-8 pb-1'>
                     <View className='flex-row justify-between items-center'>
                         <Icon name='left' color='white' size={25} onPress={() => navigation.goBack()} />
-                        <Icon2 name='dots-three-vertical' color='white' size={25} />
+                        <DropDown />
                     </View>
                     <View className='p-4'>
                         <View className={`bg-white rounded-full w-16 h-16 items-center justify-center mt-14`}>
