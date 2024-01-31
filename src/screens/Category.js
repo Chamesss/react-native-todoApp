@@ -14,9 +14,10 @@ import { ScrollView } from 'react-native-virtualized-view'
 import { GradientMask } from '../components/GradientMask'
 import { useDispatch, useSelector } from 'react-redux'
 import { tasksSelected, taskReset } from '../slices/selectionSlice'
-import Animated from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated'
 import { useSlideAnimation } from './Animations/CategoryAnimations'
 import { TasksFilter } from '../helpers/TasksFilterHelper'
+import { taskDeleted, tasks } from '../slices/tasksSlice'
 
 export default function Category({ route }) {
 
@@ -24,16 +25,14 @@ export default function Category({ route }) {
     const [finishedTasks, setFinishedTasks] = useState(null)
     const [upcomingTasks, setUpcomingTasks] = useState(null)
     const [loading, setLoading] = useState(true)
-    const [empty, setEmpty] = useState(false)
-    const [edit, setEdit] = useState(false)
-    const [actionDelete, setActionDelete] = useState(false)
     const [Show, setShow] = useState(false)
-    const [task, setTask] = useState(null)
-    const { categoryName, itemCount, tasks } = route.params;
+    const { categoryName } = route.params;
     const color = colors[categoryName];
     const SVG = svgs[categoryName]
     const navigation = useNavigation()
     const selectedTasks = useSelector(tasksSelected)
+    const Tasks = useSelector(tasks)
+    const [itemCount, setItemCount] = useState(Tasks.tasks.length)
     const dispatch = useDispatch()
     const { animatedStyle, hidingStyle, startAnimation } = useSlideAnimation();
 
@@ -55,16 +54,21 @@ export default function Category({ route }) {
     }, [selectedTasks.tasksSelected.length]);
 
     useEffect(() => {
-        if (tasks.length > 0) {
-            const { lateTasks, finishedTasks, upcomingTasks } = TasksFilter(tasks);
+        setItemCount(Tasks.tasks.length)
+        if (Tasks.tasks.length > 0) {
+            const { lateTasks, finishedTasks, upcomingTasks } = TasksFilter(Tasks.tasks);
             setLateTasks(lateTasks)
             setFinishedTasks(finishedTasks)
             setUpcomingTasks(upcomingTasks)
-        } else {
-            setEmpty(true)
         }
         setLoading(false)
-    }, [tasks])
+    }, [Tasks])
+
+    const deleteTask = () => {
+        dispatch(taskDeleted(selectedTasks.tasksSelected))
+        dispatch(taskReset())
+        setShow(false)
+    }
 
     return (
         <>
@@ -85,20 +89,36 @@ export default function Category({ route }) {
                 <View className='flex-1 w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
                     <GradientMask />
                     <ScrollView>
-                        <View className='p-8'>
-                            {lateTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-4 opacity-50'>Late</Text>}
-                            {lateTasks?.map((item) => <ListingLate key={item.id} task={item} />)}
-                            {upcomingTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Upcoming</Text>}
-                            {upcomingTasks?.map((item) => <ListingUpcoming key={item.id} task={item} />)}
-                            {finishedTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Done</Text>}
-                            {finishedTasks?.map((item) => <ListingDone key={item.id} task={item} />)}
-                        </View>
+                        {Tasks.tasks.length > 0 ? (
+                            <View className='p-8'>
+                                {lateTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-4 opacity-50'>Late</Text>}
+                                {lateTasks?.map((item) =>
+                                    <Animated.View
+                                        key={item.id}
+                                        entering={FadeIn}
+                                        exiting={FadeOut}
+                                        layout={Layout.delay(500)}
+                                    >
+                                        <ListingLate task={item} />
+                                    </Animated.View>
+                                )}
+                                {upcomingTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Upcoming</Text>}
+                                {upcomingTasks?.map((item) => <ListingUpcoming key={item.id} task={item} />)}
+                                {finishedTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Done</Text>}
+                                {finishedTasks?.map((item) => <ListingDone key={item.id} task={item} />)}
+                            </View>
+                        ) : (
+                            <View className='p-8'>
+                                <Text className='text-center mt-24 tracking-wider text-lg'>Start adding tasks!</Text>
+                            </View>
+                        )}
+
                     </ScrollView>
                 </View>
                 {Show &&
                     <Animated.View className='flex-row bg-slate-100 justify-around p-4 w-full z-50 absolute' style={[{ bottom: -100 }, animatedStyle]}>
                         <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1} onPress={() => {
-                            const selectedTask = tasks.find(task => task.id === selectedTasks.tasksSelected[0]);
+                            const selectedTask = Tasks.find(task => task.id === selectedTasks.tasksSelected[0]);
                             navigation.navigate('EditTask', { EditTask: selectedTask });
                         }}>
                             <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
@@ -106,7 +126,7 @@ export default function Category({ route }) {
                                 <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
                             </View>
                         </TouchableOpacity>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={deleteTask}>
                             <View className='items-center'>
                                 <Icon3 name='delete' size={25} color='#D11A2A' />
                                 <Text className='mt-1 text-lg font-semibold color-gray-700'>Delete ({selectedTasks.tasksSelected.length})</Text>

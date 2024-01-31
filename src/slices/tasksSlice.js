@@ -21,11 +21,12 @@ export const taskSlice = createSlice({
             };
         },
         taskDeleted(state, action) {
-            const updatedTasks = state.tasks.filter((task) => task.id !== action.payload)
+            const updatedTasks = state.tasks.filter(task => !action.payload.includes(task.id));
+            console.log(updatedTasks)
             return {
                 ...state,
                 tasks: updatedTasks,
-            }
+            };
         },
         taskEdited(state, action) {
             const task = action.payload
