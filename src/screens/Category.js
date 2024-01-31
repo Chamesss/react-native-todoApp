@@ -17,7 +17,9 @@ import { tasksSelected, taskReset } from '../slices/selectionSlice'
 import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated'
 import { useSlideAnimation } from './Animations/CategoryAnimations'
 import { TasksFilter } from '../helpers/TasksFilterHelper'
-import { taskDeleted, tasks } from '../slices/tasksSlice'
+import { tasks } from '../slices/tasksSlice'
+import { deleteTaskByIdHelper } from '../helpers/DatabaseActionsHelper'
+import * as SQLite from 'expo-sqlite'
 
 export default function Category({ route }) {
 
@@ -31,16 +33,22 @@ export default function Category({ route }) {
     const SVG = svgs[categoryName]
     const navigation = useNavigation()
     const selectedTasks = useSelector(tasksSelected)
-    const Tasks = useSelector(tasks)
-    const [itemCount, setItemCount] = useState(Tasks.tasks.length)
+    const data = useSelector(tasks)
+    const [Tasks, setTasks] = useState(() => data.tasks.filter((item) => item.category === categoryName))
+    const [itemCount, setItemCount] = useState(Tasks.length)
     const dispatch = useDispatch()
     const { animatedStyle, hidingStyle, startAnimation } = useSlideAnimation();
+    const db = SQLite.openDatabase('storage.db')
 
     useEffect(() => {
         return () => {
             dispatch(taskReset());
         }
     }, [])
+
+    useEffect(() => {
+        setTasks(() => data.tasks.filter((item) => item.category === categoryName))
+    }, [data])
 
     useEffect(() => {
         selectedTasks.tasksSelected.length > 0 ?
@@ -54,9 +62,9 @@ export default function Category({ route }) {
     }, [selectedTasks.tasksSelected.length]);
 
     useEffect(() => {
-        setItemCount(Tasks.tasks.length)
-        if (Tasks.tasks.length > 0) {
-            const { lateTasks, finishedTasks, upcomingTasks } = TasksFilter(Tasks.tasks);
+        setItemCount(Tasks.length)
+        if (Tasks.length > 0) {
+            const { lateTasks, finishedTasks, upcomingTasks } = TasksFilter(Tasks);
             setLateTasks(lateTasks)
             setFinishedTasks(finishedTasks)
             setUpcomingTasks(upcomingTasks)
@@ -65,7 +73,8 @@ export default function Category({ route }) {
     }, [Tasks])
 
     const deleteTask = () => {
-        dispatch(taskDeleted(selectedTasks.tasksSelected))
+        selectedTasks.tasksSelected.length > 0 &&
+            selectedTasks.tasksSelected.map((task) => deleteTaskByIdHelper(db, task, dispatch))
         dispatch(taskReset())
         setShow(false)
     }
@@ -89,7 +98,7 @@ export default function Category({ route }) {
                 <View className='flex-1 w-full bg-white h-full rounded-tr-[30px] rounded-tl-[30px]'>
                     <GradientMask />
                     <ScrollView>
-                        {Tasks.tasks.length > 0 ? (
+                        {Tasks.length > 0 ? (
                             <View className='p-8'>
                                 {lateTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-4 opacity-50'>Late</Text>}
                                 {lateTasks?.map((item) =>
@@ -103,9 +112,27 @@ export default function Category({ route }) {
                                     </Animated.View>
                                 )}
                                 {upcomingTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Upcoming</Text>}
-                                {upcomingTasks?.map((item) => <ListingUpcoming key={item.id} task={item} />)}
+                                {upcomingTasks?.map((item) =>
+                                    <Animated.View
+                                        key={item.id}
+                                        entering={FadeIn}
+                                        exiting={FadeOut}
+                                        layout={Layout.delay(500)}
+                                    >
+                                        <ListingUpcoming task={item} />
+                                    </Animated.View>
+                                )}
                                 {finishedTasks?.length > 0 && <Text className='text-lg tracking-wider font-semibold px-4 mt-8 opacity-50'>Done</Text>}
-                                {finishedTasks?.map((item) => <ListingDone key={item.id} task={item} />)}
+                                {finishedTasks?.map((item) =>
+                                    <Animated.View
+                                        key={item.id}
+                                        entering={FadeIn}
+                                        exiting={FadeOut}
+                                        layout={Layout.delay(500)}
+                                    >
+                                        <ListingDone task={item} />
+                                    </Animated.View>
+                                )}
                             </View>
                         ) : (
                             <View className='p-8'>

@@ -1,4 +1,4 @@
-import { taskEdited, taskAdded } from "../slices/tasksSlice";
+import { taskEdited, taskAdded, taskDeleted } from "../slices/tasksSlice";
 
 export const EditTaskHelper = (db, title, date, category, id, dispatch, navigation) => {
     db.transaction(tx => {
@@ -46,3 +46,20 @@ export const AddTaskHelper = (db, title, finishDate, category, dispatch, exitMod
         )
     })
 }
+
+export const deleteTaskByIdHelper = (db, taskId, dispatch) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(
+                'DELETE FROM tasks WHERE id = ?',
+                [taskId],
+                (txObj, resultSet) => {
+                    if (resultSet.rowsAffected > 0) {
+                        dispatch(taskDeleted(taskId));
+                    }
+                },
+                (txObj, error) => console.log(error)
+            );
+        }
+    );
+};

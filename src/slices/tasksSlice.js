@@ -21,8 +21,7 @@ export const taskSlice = createSlice({
             };
         },
         taskDeleted(state, action) {
-            const updatedTasks = state.tasks.filter(task => !action.payload.includes(task.id));
-            console.log(updatedTasks)
+            const updatedTasks = state.tasks.filter(task => task.id !== action.payload);
             return {
                 ...state,
                 tasks: updatedTasks,
