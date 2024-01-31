@@ -36,9 +36,9 @@ export default function DropDown() {
             </TouchableOpacity>
             <Animated.View style={[{ width: 0, height: 0, backgroundColor: 'white', position: 'absolute', right: 17, marginTop: 30, borderTopLeftRadius: 10, borderBottomRightRadius: 10, borderBottomLeftRadius: 10 }, animatedStyle]}>
                 {show &&
-                    <View className='p-4'>
-                        <Text>AAAAAA</Text>
-                        <Text>AAAAAA</Text>
+                    <View className='p-4 justify-center'>
+                        <Text className='p-2 text-lg'>Delete</Text>
+                        <Text className='p-2 text-lg'>Edit</Text>
                     </View>
                 }
             </Animated.View>
