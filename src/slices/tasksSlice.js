@@ -41,10 +41,19 @@ export const taskSlice = createSlice({
                 finishDate: task.finishDate,
             };
             return newState;
+        },
+        taskDone(state, action) {
+            const taskId = action.payload;
+            return {
+                ...state,
+                tasks: state.tasks.map(task =>
+                    task.id === taskId ? { ...task, status: 'done' } : task
+                ),
+            };
         }
     },
 });
 
-export const { setTasks, taskAdded, taskDeleted, taskEdited } = taskSlice.actions;
+export const { setTasks, taskAdded, taskDeleted, taskEdited, taskDone } = taskSlice.actions;
 export const tasks = (state) => state.tasks
 export default taskSlice.reducer;

@@ -6,13 +6,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { handleSelection } from '../helpers/TasksSelectionHelper';
 
 export default function ListingDone({ task }) {
-
     let Array = useSelector(tasksSelected)
     const dispatch = useDispatch()
     const [selected, setSelected] = useState(() => {
         let isExist = Array.tasksSelected.filter((id) => task.id === id)
         return isExist.length > 0
     })
+    const [ending] = useState(new Date(task.ending))
 
     return (
         <TouchableOpacity onPress={() => handleSelection(dispatch, selected, setSelected, task.id)}>
@@ -20,9 +20,9 @@ export default function ListingDone({ task }) {
                 <View>
                     <Text className={`text-lg color-blue-600 line-through ${selected && ' font-semibold'}`}>{task.title}</Text>
                     <Text className={`${selected && ' font-semibold'}`}>
-                        {task.ending.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        {ending.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         {'  '}
-                        {task.ending.toLocaleDateString('en-US', { month: 'short', day: '2-digit' })}
+                        {ending.toLocaleString('en-US', { month: 'short', day: '2-digit' })}
                     </Text>
                 </View>
                 <CustomCheckBox selected={selected} handleSelection={handleSelection} id={task.id} setSelected={setSelected} />

@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/Entypo';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import React, { useState } from 'react'
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import Icon from 'react-native-vector-icons/Entypo'
+import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons'
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
+import { useNavigation } from '@react-navigation/native'
+import { deleteTaskByIdHelper } from '../helpers/DatabaseActionsHelper'
+import { useDispatch } from 'react-redux'
+import { taskReset } from '../slices/selectionSlice'
 
-export default function DropDown() {
+export default function DropDown({ selectedTasks }) {
     const [show, setShow] = useState(false);
     const progressHeight = useSharedValue(0);
     const arrowHeight = useSharedValue(0)
+    const navigation = useNavigation()
+    const dispatch = useDispatch()
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
@@ -24,7 +31,7 @@ export default function DropDown() {
     const startAnimation = () => {
         progressHeight.value === 0 && (
             (arrowHeight.value = withTiming(10, { duration: 1 })),
-            (progressHeight.value = withTiming(100, { duration: 300 })), // Adjust your height as needed here (100)
+            (progressHeight.value = withTiming(100, { duration: 300 })),
             (setShow(true)))
         progressHeight.value > 0 && (
             (progressHeight.value = withTiming(0, { duration: 300 })),
@@ -34,6 +41,13 @@ export default function DropDown() {
             }, 200))
     }
 
+    const deleteTask = () => {
+        selectedTasks.tasksSelected.length > 0 &&
+            selectedTasks.tasksSelected.map((task) => deleteTaskByIdHelper(task, dispatch))
+        dispatch(taskReset())
+        startAnimation()
+    }
+
     return (
         <View>
             <TouchableOpacity onPress={startAnimation}>
@@ -41,10 +55,19 @@ export default function DropDown() {
             </TouchableOpacity>
             <Animated.View style={[styles.container, animatedStyle]}>
                 {show && (
-                    <View className="p-4 justify-center">
-                        <Text className="text-lg">Option 1</Text>
-                        <Text className="text-lg">Option 2</Text>
-                        <Text className="text-lg">Option 3</Text>
+                    <View className="flex-col p-4">
+                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length !== 1} onPress={() => navigation.navigate('EditTask', { EditTask: selectedTasks.tasksSelected[0] })}>
+                            <View className={`items-center flex-row ${selectedTasks.tasksSelected.length !== 1 && 'opacity-50'}`}>
+                                <Icon2 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
+                                <Text className='text-lg font-semibold color-gray-700'> Edit</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={deleteTask} disabled={selectedTasks.tasksSelected.length === 0} className='mt-5'>
+                            <View className={`items-center flex-row ${selectedTasks.tasksSelected.length === 0 && 'opacity-50'}`}>
+                                <Icon2 name='delete' size={25} color='#D11A2A' />
+                                <Text className='text-lg font-semibold color-gray-700'>Delete ({selectedTasks.tasksSelected.length})</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 )}
             </Animated.View>

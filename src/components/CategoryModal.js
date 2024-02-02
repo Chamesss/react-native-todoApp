@@ -18,7 +18,7 @@ export default function CategoryModal({ open, setOpen, category, setCategory }) 
             }}
             style={{ alignItems: 'center' }}
         >
-            <View style={{ backgroundColor: 'rgba(0,0,0,.6)' }} className='w-full h-full px-4 justify-center items-center' onPress={() => console.log('aaaaaaaaaaaa')}>
+            <View style={{ backgroundColor: 'rgba(0,0,0,.6)' }} className='w-full h-full px-4 justify-center items-center'>
                 <View className='bg-white rounded-md px-2 py-4'>
                     <View className='relative flex-row justify-center'>
                         <Text className='text-lg font-semibold mb-4'>Select a category</Text>

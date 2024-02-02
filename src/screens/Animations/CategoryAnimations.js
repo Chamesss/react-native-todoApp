@@ -1,4 +1,4 @@
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 export const useSlideAnimation = () => {
     const progress = useSharedValue(-100);

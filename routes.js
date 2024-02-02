@@ -2,16 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import SplashScreen from './src/screens/SplashScreen';
 import DrawerStack from './src/DrawerStack';
-import * as SQLite from 'expo-sqlite'
 import { useDispatch, useSelector } from 'react-redux';
 import { setTasks } from './src/slices/tasksSlice';
 import { selectTheme } from './src/slices/themeSlice';
 import { StatusBar } from 'react-native';
+import db from './src/helpers/DatabaseActionsHelper';
 
 const Routes = () => {
     const [Loading, setLoading] = useState(true)
     const dark = useSelector(selectTheme)
-    const db = SQLite.openDatabase('storage.db')
     const dispatch = useDispatch()
     useEffect(() => {
 

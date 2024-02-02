@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Add from '../components/Add'
 import { colors } from '../components/constants'
 import Icon from 'react-native-vector-icons/AntDesign'
-import Icon3 from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon2 from 'react-native-vector-icons/MaterialIcons'
 import { svgs } from '../components/constants'
 import ListingLate from '../components/ListingLate'
 import ListingUpcoming from '../components/ListingUpcoming'
@@ -17,9 +17,8 @@ import Animated, { FadeIn, FadeOut, Layout } from 'react-native-reanimated'
 import { useSlideAnimation } from './Animations/CategoryAnimations'
 import { TasksFilter } from '../helpers/TasksFilterHelper'
 import { tasks } from '../slices/tasksSlice'
-import { deleteTaskByIdHelper } from '../helpers/DatabaseActionsHelper'
-import * as SQLite from 'expo-sqlite'
 import DropDown from '../components/DropDown'
+import { markDoneTaskByIdHelper } from '../helpers/DatabaseActionsHelper'
 
 export default function Category({ route }) {
 
@@ -38,7 +37,6 @@ export default function Category({ route }) {
     const [itemCount, setItemCount] = useState(Tasks.length)
     const dispatch = useDispatch()
     const { animatedStyle, hidingStyle, startAnimation } = useSlideAnimation();
-    const db = SQLite.openDatabase('storage.db')
 
     useEffect(() => {
         return () => {
@@ -74,9 +72,8 @@ export default function Category({ route }) {
         setLoading(false)
     }, [Tasks])
 
-    const deleteTask = () => {
-        selectedTasks.tasksSelected.length > 0 &&
-            selectedTasks.tasksSelected.map((task) => deleteTaskByIdHelper(db, task, dispatch))
+    const markDoneTask = () => {
+        selectedTasks.tasksSelected.map((task) => markDoneTaskByIdHelper(task, dispatch))
         dispatch(taskReset())
         setShow(false)
     }
@@ -87,7 +84,7 @@ export default function Category({ route }) {
                 <View className='px-8 pt-8 pb-1'>
                     <View className='flex-row justify-between items-center'>
                         <Icon name='left' color='white' size={25} onPress={() => navigation.goBack()} />
-                        <DropDown />
+                        <DropDown selectedTasks={selectedTasks} />
                     </View>
                     <View className='p-4'>
                         <View className={`bg-white rounded-full w-16 h-16 items-center justify-center mt-14`}>
@@ -146,19 +143,13 @@ export default function Category({ route }) {
                 </View>
                 {Show &&
                     <Animated.View className='flex-row bg-slate-100 justify-around p-4 w-full z-50 absolute' style={[{ bottom: -100 }, animatedStyle]}>
-                        <TouchableOpacity disabled={selectedTasks.tasksSelected.length > 1} onPress={() => {
-                            const selectedTask = Tasks.find(task => task.id === selectedTasks.tasksSelected[0]);
-                            navigation.navigate('EditTask', { EditTask: selectedTask });
-                        }}>
-                            <View className={`items-center ${selectedTasks.tasksSelected.length > 1 && 'opacity-50'}`}>
-                                <Icon3 size={25} name='clipboard-edit' color='rgb(55, 65, 81)' />
-                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Edit</Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={deleteTask}>
-                            <View className='items-center'>
-                                <Icon3 name='delete' size={25} color='#D11A2A' />
-                                <Text className='mt-1 text-lg font-semibold color-gray-700'>Delete ({selectedTasks.tasksSelected.length})</Text>
+                        <TouchableOpacity onPress={markDoneTask}>
+                            <View
+                                style={{ elevation: 5 }}
+                                className='flex-row justify-center items-center'>
+                                <Text className='font-semibold text-lg'>Completed ({selectedTasks.tasksSelected.length}) </Text>
+                                <Icon2 name='done' size={30} color='#5cb85c'
+                                />
                             </View>
                         </TouchableOpacity>
                     </Animated.View>

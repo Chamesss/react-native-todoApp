@@ -3,13 +3,12 @@ import React, { useState } from 'react'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux'
-import * as SQLite from 'expo-sqlite'
 import CategoryModal from './CategoryModal'
 import { TimerSetter, DateSetter } from '../helpers/TasksTimerHelper'
 import { AddTaskHelper } from '../helpers/DatabaseActionsHelper'
 
-
 export default function ModalWindow({ exitModal }) {
+
     const [newDate, setNewDate] = useState(() => new Date().toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -26,7 +25,6 @@ export default function ModalWindow({ exitModal }) {
     const [taskError, setTaskError] = useState(false)
     const [open, setOpen] = useState(false)
     const [category, setCategory] = useState('undefined')
-    const db = SQLite.openDatabase('storage.db')
     const dispatch = useDispatch()
 
     const handlePickerChange = ({ type }, selectedDate) => {
@@ -49,7 +47,7 @@ export default function ModalWindow({ exitModal }) {
 
     const handleCreateTask = () => {
         title.length > 0 ?
-            AddTaskHelper(db, title, finishDate, category, dispatch, exitModal) :
+            AddTaskHelper(title, finishDate, category, dispatch, exitModal) :
             setTaskError(true)
     }
 

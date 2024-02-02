@@ -1,6 +1,11 @@
-import { taskEdited, taskAdded, taskDeleted } from "../slices/tasksSlice";
+import { taskEdited, taskAdded, taskDeleted, taskDone } from "../slices/tasksSlice";
+import * as SQLite from 'expo-sqlite'
 
-export const EditTaskHelper = (db, title, date, category, id, dispatch, navigation) => {
+const db = SQLite.openDatabase('storage.db');
+
+export default db;
+
+export const EditTaskHelper = (title, date, category, id, dispatch, navigation) => {
     db.transaction(tx => {
         tx.executeSql(
             'UPDATE tasks SET title = ?, ending = ?, category = ? WHERE id = ?',
@@ -23,7 +28,24 @@ export const EditTaskHelper = (db, title, date, category, id, dispatch, navigati
     });
 }
 
-export const AddTaskHelper = (db, title, finishDate, category, dispatch, exitModal) => {
+export const markDoneTaskByIdHelper = (task, dispatch) => {
+    db.transaction(tx => {
+        tx.executeSql(
+            'UPDATE tasks SET status = "done" WHERE id = ?',
+            [task],
+            (txObj, resultSet) => {
+                if (resultSet.rowsAffected > 0) {
+                    dispatch(taskDone(task))
+                } else {
+                    console.log('No task found with the specified id');
+                }
+            },
+            (txObj, error) => console.log(error)
+        );
+    });
+}
+
+export const AddTaskHelper = (title, finishDate, category, dispatch, exitModal) => {
     const currentDate = new Date(new Date().getTime() + 60 * 60 * 1000).toISOString();
     const status = 'todo'
     const date = finishDate.toISOString()
@@ -47,7 +69,7 @@ export const AddTaskHelper = (db, title, finishDate, category, dispatch, exitMod
     })
 }
 
-export const deleteTaskByIdHelper = (db, taskId, dispatch) => {
+export const deleteTaskByIdHelper = (taskId, dispatch) => {
     db.transaction(
         (tx) => {
             tx.executeSql(

@@ -12,11 +12,10 @@ import { useState } from 'react'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux'
-import * as SQLite from 'expo-sqlite'
 import CategoryModal from '../components/CategoryModal'
 import { useNavigation } from '@react-navigation/native'
 import { TimerSetter, DateSetter } from '../helpers/TasksTimerHelper'
-import { EditTaskHelper } from '../helpers/DatabaseActionsHelper';
+import { EditTaskHelper } from '../helpers/DatabaseActionsHelper'
 
 export default function EditTask({ route }) {
     const { EditTask } = route.params
@@ -41,7 +40,6 @@ export default function EditTask({ route }) {
     const [open, setOpen] = useState(false)
     const dispatch = useDispatch()
     const navigation = useNavigation()
-    const db = SQLite.openDatabase('storage.db')
 
     const handlePickerChange = ({ type }, selectedDate) => {
         setShowPicker(false);
@@ -64,7 +62,7 @@ export default function EditTask({ route }) {
     const handleCreateTask = () => {
         const date = finishDate.toISOString()
         title.length > 0 ?
-            EditTaskHelper(db, title, date, category, EditTask.id, dispatch, navigation) :
+            EditTaskHelper(title, date, category, EditTask.id, dispatch, navigation) :
             setTaskError(true)
     }
 
