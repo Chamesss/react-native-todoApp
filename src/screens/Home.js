@@ -1,5 +1,4 @@
 import { Text, View, TouchableOpacity, ScrollView, Image } from 'react-native'
-import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { selectTheme } from '../slices/themeSlice'
 import { useNavigation } from '@react-navigation/native'
@@ -8,30 +7,28 @@ import { getFormattedDate } from '../utils/Date'
 import TaskBox from '../components/TaskBox'
 import Add from '../components/Add'
 import { tasks } from '../slices/tasksSlice'
+import { computed } from '@preact/signals'
 
 const Home = () => {
     const data = useSelector(tasks)
-    const [count, setCount] = useState(data.tasks?.length)
     const dark = useSelector(selectTheme)
     const navigation = useNavigation()
     const date = getFormattedDate()
-    const [categories, setCategories] = useState(null)
-
-    useEffect(() => {
-        setCount(data?.tasks?.length)
+    const count = computed(() => data.tasks?.length)
+    const categories = computed(() => {
         let countByCategory = {}
         data.tasks?.length > 0 ? data.tasks.forEach((task) => countByCategory[task.category] = (countByCategory[task.category] || 0) + 1) : null
         delete countByCategory['undefined']
-        setCategories(countByCategory)
-    }, [data])
+        return countByCategory
+    })
 
     return (
         <>
             <View className={`relative flex-1 ${dark ? 'bg-slate-900' : 'bg-[rgb(252,252,252)]'}`}>
                 <View className='flex-row justify-between items-start pt-8 px-8'>
                     <View>
-                        <Text className=' opacity-80 text-xl font-semibold tracking-wider'>Today</Text>
-                        <Text className=' opacity-50 mb-5'>{date}</Text>
+                        <Text className='opacity-80 text-xl font-semibold tracking-wider'>Today</Text>
+                        <Text className='opacity-50 mb-5'>{date}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.openDrawer()}>
                         <Icon color={'black'} name='three-bars' size={30} />
@@ -40,7 +37,7 @@ const Home = () => {
                 <View className='mt-4 px-8 pb-4'>
                     <Text className=" opacity-80 text-3xl font-semibold tracking-widest">Lists</Text>
                 </View>
-                {count > 0 ? (
+                {count.value > 0 ? (
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled"
                         showsVerticalScrollIndicator={false}
                     >
@@ -48,8 +45,8 @@ const Home = () => {
                             <View className='w-44 h-44'>
                                 <TaskBox categoryName={'all'} itemCount={count} tasks={data.tasks} />
                             </View>
-                            {categories &&
-                                Object.entries(categories).map((item) => {
+                            {categories.value &&
+                                Object.entries(categories.value).map((item) => {
                                     const tasks = data.tasks.filter((task) => task.category === item[0])
                                     return (
                                         <View key={item[0]} className='w-44 h-44 mt-4'>

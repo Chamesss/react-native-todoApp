@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import SplashScreen from './src/screens/SplashScreen';
 import DrawerStack from './src/DrawerStack';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTasks } from './src/slices/tasksSlice';
@@ -42,7 +41,7 @@ const Routes = () => {
                 backgroundColor={dark ? 'rgb(15 23 42)' : 'rgb(248 250 252)'}
                 barStyle={dark ? 'light-content' : 'dark-content'}
             />
-            {Loading ? (<SplashScreen />) : (<DrawerStack />)}
+            {Loading ? (null) : (<DrawerStack />)}
         </NavigationContainer>
     );
 };

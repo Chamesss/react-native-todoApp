@@ -11,14 +11,16 @@ import {
 import { useState } from 'react'
 import Icon2 from 'react-native-vector-icons/Octicons'
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import CategoryModal from '../components/CategoryModal'
 import { useNavigation } from '@react-navigation/native'
 import { TimerSetter, DateSetter } from '../helpers/TasksTimerHelper'
 import { EditTaskHelper } from '../helpers/DatabaseActionsHelper'
+import { tasks } from '../slices/tasksSlice';
 
 export default function EditTask({ route }) {
-    const { EditTask } = route.params
+    const data = useSelector(tasks)
+    const [[EditTask]] = useState(() => data.tasks.filter((t) => t.id === route.params.EditTask))
     const [newDate, setNewDate] = useState(() => new Date(EditTask.ending).toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
